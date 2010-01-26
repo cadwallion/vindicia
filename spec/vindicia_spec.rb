@@ -16,25 +16,25 @@ describe Vindicia::Account do
   
   describe '#update' do
     it 'should create/update an account' do
-      ret, account, created = @client.update({
+      account, created = @client.update({
         :merchantAccountId => "123",
         :name => "bob"
       })
-      account['VID'].should =~ /^[0-9a-f]{40}$/
+      account.VID.should =~ /^[0-9a-f]{40}$/
     end
 
     it 'should update a name' do
-      ret, account, created = @client.update({
+      account, created = @client.update({
         :merchantAccountId => '123',
         :name => 'bob'
       })
-      account['name'].should == 'bob'
+      account.name.should == 'bob'
 
-      ret, account, created = @client.update({
+      account, created = @client.update({
         :merchantAccountId => '123',
         :name => 'sam'
       })
-      account['name'].should == 'sam'
+      account.name.should == 'sam'
     end
   end
   
@@ -44,24 +44,40 @@ describe Vindicia::Account do
         :merchantAccountId => '123',
         :name => 'bob'
       })
-      ret, account = @client.fetchByMerchantAccountId('123')
-      account['name'].should == 'bob'
+      account = @client.fetchByMerchantAccountId('123')
+      account.name.should == 'bob'
     end
   end
   
 end
 
+describe Vindicia::Product do
+  it 'should look up by merchant id' do
+    product = Vindicia::Product.find_by_merchant_id('em-2-PREMIUM-USD')
+    product.description.should == 'EM PREMIUM-USD Subscription'
+  end
+  
+  it 'should look up by VID' do
+    product = Vindicia::Product.find_by_vid('3ef764ca203485052c99db99401c0f5a1e9c03d4')
+    product.description.should == 'EM PREMIUM-USD Subscription'
+  end
+  
+  it 'should return a Return with the Product' do
+    product = Vindicia::Product.find_by_merchant_id('em-2-PREMIUM-USD')
+    product.status.code.should == 200
+  end
+end
+
 describe Vindicia do
-  it 'should set up a recurring purchase' do
+  xit 'should set up a recurring purchase' do
     # Product, BillingPlan are set up in CashBox by hand
-    ret, account, created = Vindicia::Account.update({
+    account, created = Vindicia::Account.update({
       :merchantAccountId => Time.now.to_i.to_s,
       :name => 'Integration User'
     })
-    ret, account, validated = Vindicia::Account.updatePaymentMethod({
+    account, validated = Vindicia::Account.updatePaymentMethod({
       # Account
-      :VID => account['VID'],
-      :emailTypePreference => 'plaintext'
+      :VID => account['VID']
     }, {
       # Payment Method
       :type => 'CreditCard',
@@ -81,15 +97,18 @@ describe Vindicia do
       },
       :merchantPaymentMethodId => "Purchase.id #{Time.now.to_i}"
     }, true, 'Update', nil)
-    ret, product = Vindicia::Product.fetchByMerchantProductId('em-2-PREMIUM-USD')
-    ret, billing = Vindicia::BillingPlan.fetchByMerchantBillingPlanId('em-2-PREMIUM-USD')
-    ret, autobill, created, authstatus, firstBillDate, firstBillAmount, firstBillingCurrency =
+    product = Vindicia::Product.fetchByMerchantProductId('em-2-PREMIUM-USD')
+    billing = Vindicia::BillingPlan.fetchByMerchantBillingPlanId('em-2-PREMIUM-USD')
+    autobill, created, authstatus, firstBillDate, firstBillAmount, firstBillingCurrency =
       Vindicia::AutoBill.update({
         :account => {:VID => account['VID'], :emailTypePreference => 'plaintext'},
         :product => {:VID => product['VID'], :status => product['status'], :taxClassification => product['taxClassification']},
         :billingPlan => {:VID => billing['VID'], :status => billing['status']},
         :status => 'Active'
-      }, 'Fail', true, 100)
+      }, 'Fail', true, 100
+    )
+    
+    autobill.status.code.should == 200
   end
 end
 

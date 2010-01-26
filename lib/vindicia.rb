@@ -35,22 +35,20 @@ module Vindicia
   end
   
   module SoapClient
-    def soap
-      @soap ||= begin
-        s = wsdl.create_rpc_driver
-        # prodtest/staging wsdl are identical to production, so force a correct url
-        s.proxy.instance_variable_set('@endpoint_url', Vindicia.endpoint)
-        s.wiredump_dev = STDERR if $DEBUG
-        s
-      end
+    def self.extended(base)
+      name = base.to_s.split('::').last
+      base.returns :fetchByVid, base
+      base.returns :"fetchByMerchant#{name}Id", base
     end
-
-    def method_missing(method, *args)
-      if args[0].kind_of? Hash
-        args[0] = defaults_for(method).merge(args.first)
-      end
-      with_soap do |soap|
-        soap.send(method, Vindicia.auth, *args.clone)
+    
+    def coerce_returns_for(method, objects)
+      @return_mappings[method].zip(objects).map do |c,o|
+        case c
+        when :boolean, :string
+          o
+        else
+          c.new(o)
+        end
       end
     end
     
@@ -63,7 +61,27 @@ module Vindicia
       @defaults ||= {}
       @defaults[method] || {}
     end
+    
+    def find_by_merchant_id(id)
+      self.send(:"fetchByMerchant#{self.to_s.split('::').last}Id", id)
+    end
+    
+    def find_by_vid(id)
+      fetchByVid(id)
+    end
 
+    def method_missing(method, *args)
+      if args[0].kind_of? Hash
+        args[0] = defaults_for(method).merge(args.first)
+      end
+      with_soap do |soap|
+        objs = soap.send(method, Vindicia.auth, *args.clone)
+        ret, *objs = coerce_returns_for(method, objs)
+        objs.first.status = ret
+        objs.size == 1 ? objs.first : objs
+      end
+    end
+    
     def quietly
       # Squelch warnings on stderr
       stderr = $stderr
@@ -72,7 +90,22 @@ module Vindicia
       $stderr = stderr
       ret
     end
+    
+    def returns(method, *classes)
+      @return_mappings ||= Hash.new([Return])
+      @return_mappings[method] += classes
+    end
   
+    def soap
+      @soap ||= begin
+        s = wsdl.create_rpc_driver
+        # prodtest/staging wsdl are identical to production, so force a correct url
+        s.proxy.instance_variable_set('@endpoint_url', Vindicia.endpoint)
+        s.wiredump_dev = STDERR if $DEBUG
+        s
+      end
+    end
+
     def with_soap
       ret = quietly { yield soap }
       soap.reset_stream
@@ -86,36 +119,62 @@ module Vindicia
     end
   end
   
-  class Account
-    extend SoapClient
-    default :update, :emailTypePreference => 'plaintext'
+  class SoapObject
+    attr_accessor :status
+    
+    def initialize(soap=nil)
+      @values = {}
+      soap.instance_variable_get('@__xmlele').each do |qname, value|
+        @values[qname.name] = value
+      end if soap
+    end
+    
+    def method_missing(method, *args)
+      if @values.has_key? method.to_s
+        @values[method.to_s]
+      else
+        super
+      end
+    end
   end
   
-  # class Activity
-  #   extend SoapClient
-  # end
-  # 
-  # class Address
-  #   extend SoapClient
-  # end
-
-  class AutoBill
+  class Return
+    attr_reader :code, :response
+    def initialize(soap)
+      @code = soap['returnCode'].to_i
+      @response = soap['returnString']
+    end
+  end
+  
+  class Account < SoapObject
+    extend SoapClient
+    
+    default :update, :emailTypePreference => 'plaintext'
+    returns :update, Account, :boolean
+    
+    default :updatePaymentMethod, :emailTypePreference => 'plaintext'
+  end
+  
+  class AutoBill < SoapObject
     extend SoapClient
   end
 
-  class BillingPlan
+  class BillingPlan < SoapObject
     extend SoapClient
   end
 
-  # class Chargeback < SoapClient ; end
-  # class Entitlement < SoapClient ; end
-  # class PaymentMethod < SoapClient ; end
-  # class PaymentProvider < SoapClient ; end
-  class Product
+  class Product < SoapObject
     extend SoapClient
   end
 
-  # class Refund < SoapClient ; end
-  # class Transaction < SoapClient ; end
+  # TODO:
+  # Activity
+  # Address
+  # Chargeback
+  # Entitlement
+  # PaymentMethod
+  # PaymentProvider
+  # Refund
+  # Transaction
   
 end
