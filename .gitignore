@@ -1,1 +1,3 @@
+*.gemspec
+pkg
 spec/authenticate.rb
