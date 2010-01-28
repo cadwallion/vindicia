@@ -44,22 +44,24 @@ module Vindicia
     def coerce_returns_for(method, objects)
       @return_mappings[method].zip(objects).map do |c,o|
         case c
-        when :boolean, :string
+        when :boolean, :string, :date
           o
+        when :decimal
+          o.to_i
         else
           c.new(o)
         end
       end
     end
     
-    def default(method, defaults)
+    def default(method, *defaults)
       @defaults ||= {}
       @defaults[method] = defaults
     end
     
     def defaults_for(method)
       @defaults ||= {}
-      @defaults[method] || {}
+      @defaults[method] || []
     end
     
     def find_by_merchant_id(id)
@@ -71,13 +73,19 @@ module Vindicia
     end
 
     def method_missing(method, *args)
-      if args[0].kind_of? Hash
-        args[0] = defaults_for(method).merge(args.first)
+      # Need to make args and defaults the same size to zip() properly
+      defaults = defaults_for(method)
+      defaults << nil while defaults.size < args.size
+      args << nil while args.size < defaults.size
+      
+      opts = args.zip(defaults).map do |arg, default|
+        default.is_a?(Hash) ? default.merge(arg||{}, &r_merge) : arg || default
       end
+      
       with_soap do |soap|
-        objs = soap.send(method, Vindicia.auth, *args.clone)
+        objs = soap.send(method, Vindicia.auth, *opts)
         ret, *objs = coerce_returns_for(method, objs)
-        objs.first.status = ret
+        objs.first.request_status = ret
         objs.size == 1 ? objs.first : objs
       end
     end
@@ -91,6 +99,19 @@ module Vindicia
       ret
     end
     
+    def r_merge
+      @r_merge ||= proc do |key,v1,v2|
+        Hash === v1 && Hash === v2 ? v1.merge(v2, &r_merge) : v2
+      end
+    end
+    
+    def required(*fields)
+      @required_fields = fields
+    end
+    def required_fields
+      @required_fields || []
+    end
+    
     def returns(method, *classes)
       @return_mappings ||= Hash.new([Return])
       @return_mappings[method] += classes
@@ -99,7 +120,7 @@ module Vindicia
     def soap
       @soap ||= begin
         s = wsdl.create_rpc_driver
-        # prodtest/staging wsdl are identical to production, so force a correct url
+        # prodtest/staging wsdl point to production urls, so correct them
         s.proxy.instance_variable_set('@endpoint_url', Vindicia.endpoint)
         s.wiredump_dev = STDERR if $DEBUG
         s
@@ -120,7 +141,7 @@ module Vindicia
   end
   
   class SoapObject
-    attr_accessor :status
+    attr_accessor :request_status
     
     def initialize(soap=nil)
       @values = {}
@@ -136,6 +157,12 @@ module Vindicia
         super
       end
     end
+    
+    # TODO: respond_to?
+    
+    def vid_reference
+      (self.class.required_fields + [:VID]).inject({}){|h,k| h[k] = @values[k.to_s]; h}
+    end
   end
   
   class Return
@@ -145,28 +172,40 @@ module Vindicia
       @response = soap['returnString']
     end
   end
+
+  class TransactionStatus < SoapObject ; end
   
   class Account < SoapObject
     extend SoapClient
     
+    required :emailTypePreference
+    
     default :update, :emailTypePreference => 'plaintext'
     returns :update, Account, :boolean
     
-    default :updatePaymentMethod, :emailTypePreference => 'plaintext'
+    default :updatePaymentMethod, {}, {:creditCard => {:hashType => 'sha1'}}, true, 'Update', nil
+    returns :updatePaymentMethod, Account, :boolean
   end
   
   class AutoBill < SoapObject
     extend SoapClient
+    
+    default :update, {:status => 'Active'}, 'Fail', true, 100
+    returns :update, AutoBill, :boolean, TransactionStatus, :date, :decimal, :string
   end
 
   class BillingPlan < SoapObject
     extend SoapClient
+    
+    required :status
   end
 
   class Product < SoapObject
     extend SoapClient
+    
+    required :status, :taxClassification
   end
-
+  
   # TODO:
   # Activity
   # Address
