@@ -165,12 +165,9 @@ module Vindicia
     end
   end
   
-  class Return
-    attr_reader :code, :response
-    def initialize(soap)
-      @code = soap['returnCode'].to_i
-      @response = soap['returnString']
-    end
+  class Return < SoapObject
+    def code; self.returnCode.to_i; end
+    def response; self.returnString; end
   end
 
   class TransactionStatus < SoapObject ; end
