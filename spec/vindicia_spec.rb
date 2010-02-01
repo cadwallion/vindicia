@@ -4,10 +4,6 @@ require 'spec'
 require 'spec/authenticate'
 
 describe Vindicia::Account do
-  before :each do
-    @client = Vindicia::Account
-  end
-
   it 'should return a singleton soap wrapper' do
     a = Vindicia::Account
     b = Vindicia::Account
@@ -16,7 +12,7 @@ describe Vindicia::Account do
   
   describe '#update' do
     it 'should create/update an account' do
-      account, created = @client.update({
+      account, created = Vindicia::Account.update({
         :merchantAccountId => "123",
         :name => "bob"
       })
@@ -24,13 +20,13 @@ describe Vindicia::Account do
     end
 
     it 'should update a name' do
-      account, created = @client.update({
+      account, created = Vindicia::Account.update({
         :merchantAccountId => '123',
         :name => 'bob'
       })
       account.name.should == 'bob'
 
-      account, created = @client.update({
+      account, created = Vindicia::Account.update({
         :merchantAccountId => '123',
         :name => 'sam'
       })
@@ -40,11 +36,11 @@ describe Vindicia::Account do
   
   describe '#find_by_merchant_id' do
     it 'should return an account' do
-      @client.update({
+      Vindicia::Account.update({
         :merchantAccountId => '123',
         :name => 'bob'
       })
-      account = @client.find_by_merchant_id('123')
+      account = Vindicia::Account.find_by_merchant_id('123')
       account.name.should == 'bob'
     end
   end
