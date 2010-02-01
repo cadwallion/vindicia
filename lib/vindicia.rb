@@ -175,19 +175,16 @@ module Vindicia
   class Account < SoapObject
     extend SoapClient
     
-    required :emailTypePreference
-    
-    default :update, :emailTypePreference => 'plaintext'
     returns :update, Account, :boolean
     
-    default :updatePaymentMethod, {}, {:creditCard => {:hashType => 'sha1'}}, true, 'Update', nil
+    default :updatePaymentMethod, {}, {}, true, 'Update', nil
     returns :updatePaymentMethod, Account, :boolean
   end
   
   class AutoBill < SoapObject
     extend SoapClient
     
-    default :update, {:status => 'Active'}, 'Fail', true, 100
+    default :update, {}, 'Fail', true, 100
     returns :update, AutoBill, :boolean, TransactionStatus, :date, :decimal, :string
   end
 
@@ -213,4 +210,10 @@ module Vindicia
   # Refund
   # Transaction
   
+end
+
+class WSDL::XMLSchema::SimpleRestriction
+  def check_restriction(value)
+    @enumeration.empty? or @enumeration.include?(value) or value.nil?
+  end
 end
