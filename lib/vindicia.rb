@@ -235,3 +235,14 @@ class WSDL::XMLSchema::SimpleRestriction
     @enumeration.empty? or @enumeration.include?(value) or value.nil?
   end
 end
+
+if true
+  class SOAP::HTTPStreamHandler
+    def send(endpoint_url, conn_data, soapaction = nil, charset = @charset)
+      puts conn_data.send_string
+      conn_data.soapaction ||= soapaction # for backward conpatibility
+      send_post(endpoint_url, conn_data, charset)
+    end
+  end
+end
+
