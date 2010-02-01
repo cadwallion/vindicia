@@ -2,7 +2,7 @@ require 'soap/wsdlDriver'
 
 module Vindicia
   class << self
-    attr_reader :login, :password
+    attr_reader :login, :password, :environment
     def authenticate(login, pass, env=:prodtest)
       @login       = login
       @password    = pass
@@ -85,8 +85,17 @@ module Vindicia
       with_soap do |soap|
         objs = soap.send(method, Vindicia.auth, *opts)
         ret, *objs = coerce_returns_for(method, objs)
-        objs.first.request_status = ret
-        objs.size == 1 ? objs.first : objs
+        case objs.size
+        when 0
+          ret.request_status = ret
+          ret
+        when 1
+          objs.first.request_status = ret
+          objs.first
+        else
+          objs.first.request_status = ret
+          objs
+        end
       end
     end
     
@@ -141,7 +150,7 @@ module Vindicia
   end
   
   class SoapObject
-    attr_accessor :request_status
+    attr_accessor :request_status, :values
     
     def initialize(soap=nil)
       @values = {}
@@ -160,6 +169,10 @@ module Vindicia
     
     # TODO: respond_to?
     
+    def vid
+      self.VID
+    end
+
     def vid_reference
       (self.class.required_fields + [:VID]).inject({}){|h,k| h[k] = @values[k.to_s]; h}
     end
@@ -200,6 +213,12 @@ module Vindicia
     required :status, :taxClassification
   end
   
+  class Transaction < SoapObject
+    extend SoapClient
+
+    default :auth, {}, 100, false
+  end
+
   # TODO:
   # Activity
   # Address
@@ -208,7 +227,6 @@ module Vindicia
   # PaymentMethod
   # PaymentProvider
   # Refund
-  # Transaction
   
 end
 

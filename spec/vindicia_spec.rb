@@ -65,13 +65,13 @@ describe Vindicia::Product do
 end
 
 describe Vindicia do
-  it 'should set up a recurring purchase' do
+  before :each do
     # Product, BillingPlan are set up in CashBox by hand
     account, created = Vindicia::Account.update({
       :merchantAccountId => Time.now.to_i.to_s,
       :name => 'Integration User'
     })
-    account, validated = Vindicia::Account.updatePaymentMethod(account.vid_reference, {
+    @account, validated = Vindicia::Account.updatePaymentMethod(account.vid_reference, {
       # Payment Method
       :type => 'CreditCard',
       :creditCard => {
@@ -89,16 +89,47 @@ describe Vindicia do
       },
       :merchantPaymentMethodId => "Purchase.id #{Time.now.to_i}"
     })
-    product = Vindicia::Product.find_by_merchant_id('em-2-PREMIUM-USD')
-    billing = Vindicia::BillingPlan.find_by_merchant_id('em-2-PREMIUM-USD')
-    autobill, created, authstatus, firstBillDate, firstBillAmount, firstBillingCurrency = \
-    Vindicia::AutoBill.update({
-      :account => account.vid_reference,
-      :product => product.vid_reference,
-      :billingPlan => billing.vid_reference
-    })
+    @product = Vindicia::Product.find_by_merchant_id('em-2-PREMIUM-USD')
+    @billing = Vindicia::BillingPlan.find_by_merchant_id('em-2-PREMIUM-USD')
+  end
+
+  describe Vindicia::AutoBill do
+    it 'create recurring billing' do
+      autobill, created, authstatus, firstBillDate, firstBillAmount, firstBillingCurrency = \
+      Vindicia::AutoBill.update({
+        :account => @account.vid_reference,
+        :product => @product.vid_reference,
+        :billingPlan => @billing.vid_reference
+      })
     
-    autobill.request_status.code.should == 200
+      autobill.request_status.code.should == 200
+    end
+  end
+
+  describe Vindicia::Transaction do
+    describe '#auth' do
+      it 'should auth a purchase' do
+        transaction = Vindicia::Transaction.auth({
+          :amount                 => 49.00,
+          :merchantTransactionId  => "Purchase.id #{Time.now.to_i}",
+          :account                => @account.vid_reference,
+          :statusLog              => [:status => "New"],
+          :transactionItems       => [{:sku => 'sku', :name => 'Established Men Subscription', :price => 49.00, :quantity => 1}]
+          #:divisionNumber                xsd:string
+          #:userAgent                     xsd:string
+          #:sourceMacAddress              xsd:string
+          #:sourceIp                      xsd:string
+          #:billingStatementIdentifier    xsd:string
+        })
+        p transaction
+        transaction.request_status.code.should == 200
+      end
+    end
+
+    describe '#capture' do
+    end
+
+    describe '#authCapture' do
+    end
   end
 end
-
