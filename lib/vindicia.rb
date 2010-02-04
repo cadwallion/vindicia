@@ -36,18 +36,20 @@ module Vindicia
   
   module SoapClient
     def self.extended(base)
-      name = base.to_s.split('::').last
       base.returns :fetchByVid, base
       base.returns :"fetchByMerchant#{name}Id", base
     end
     
     def coerce_returns_for(method, objects)
-      @return_mappings[method].zip(objects).map do |c,o|
+      return_mappings[method].zip(objects).map do |c,o|
         case c
         when :boolean, :string, :date
           o
-        when :decimal
+        when :decimal, :int
           o.to_i
+        when Array
+          cls = c.first
+          o.map{|e|cls.new(e)}
         else
           c.new(o)
         end
@@ -64,12 +66,8 @@ module Vindicia
       @defaults[method] || []
     end
     
-    def find_by_merchant_id(id)
-      self.send(:"fetchByMerchant#{self.to_s.split('::').last}Id", id)
-    end
-    
-    def find_by_vid(id)
-      fetchByVid(id)
+    def find(id)
+      self.send(:"fetchByMerchant#{name}Id", id)
     end
 
     def method_missing(method, *args)
@@ -85,6 +83,9 @@ module Vindicia
       with_soap do |soap|
         objs = soap.send(method, Vindicia.auth, *opts)
         ret, *objs = coerce_returns_for(method, objs)
+        
+        return [ret] + objs unless objs.first.is_a? SoapObject
+        
         case objs.size
         when 0
           ret.request_status = ret
@@ -97,6 +98,10 @@ module Vindicia
           objs
         end
       end
+    end
+    
+    def name
+      self.to_s.split('::').last
     end
     
     def quietly
@@ -122,8 +127,14 @@ module Vindicia
     end
     
     def returns(method, *classes)
-      @return_mappings ||= Hash.new([Return])
-      @return_mappings[method] += classes
+      return_mappings[method] += classes
+    end
+    def return_mappings
+      @return_mappings ||= begin
+        map = Hash.new([Return])
+        map[:"fetchByMerchant#{name}Id"] += [self]
+        map
+      end
     end
   
     def soap
@@ -144,19 +155,33 @@ module Vindicia
   
     def wsdl
       @wsdl ||= quietly do
-        SOAP::WSDLDriverFactory.new(Vindicia.wsdl(self.to_s.split('::').last))
+        SOAP::WSDLDriverFactory.new(Vindicia.wsdl(name))
       end
     end
   end
   
   class SoapObject
+    include Comparable
     attr_accessor :request_status, :values
     
-    def initialize(soap=nil)
+    def initialize(arg=nil)
       @values = {}
-      soap.instance_variable_get('@__xmlele').each do |qname, value|
-        @values[qname.name] = value
-      end if soap
+      case arg
+        when String
+          @values["merchant#{classname}Id"] = arg
+        when Hash
+          arg.each do |key, value|
+            @values[key.to_s] = value
+          end
+        when SOAP::Mapping::Object
+          arg.instance_variable_get('@__xmlele').each do |qname, value|
+            @values[qname.name] = value
+          end
+      end
+    end
+    
+    def classname
+      self.class.name
     end
     
     def method_missing(method, *args)
@@ -169,12 +194,9 @@ module Vindicia
     
     # TODO: respond_to?
     
-    def vid
-      self.VID
-    end
-
-    def vid_reference
-      (self.class.required_fields + [:VID]).inject({}){|h,k| h[k] = @values[k.to_s]; h}
+    def ref
+      key = "merchant#{classname}Id"
+      {key => @values[key] || @values[key.to_sym]}
     end
   end
   
@@ -183,6 +205,7 @@ module Vindicia
     def response; self.returnString; end
   end
 
+  class CaptureResult < SoapObject ; end
   class TransactionStatus < SoapObject ; end
   
   class Account < SoapObject
@@ -203,20 +226,22 @@ module Vindicia
 
   class BillingPlan < SoapObject
     extend SoapClient
-    
-    required :status
   end
 
   class Product < SoapObject
     extend SoapClient
-    
-    required :status, :taxClassification
   end
   
   class Transaction < SoapObject
     extend SoapClient
 
     default :auth, {}, 100, false
+    returns :auth, Transaction
+    
+    default :authCapture, {}, false
+    returns :authCapture, Transaction
+    
+    returns :capture, :int, :int, [CaptureResult]
   end
 
   # TODO:
@@ -236,7 +261,7 @@ class WSDL::XMLSchema::SimpleRestriction
   end
 end
 
-if true
+if false
   class SOAP::HTTPStreamHandler
     def send(endpoint_url, conn_data, soapaction = nil, charset = @charset)
       puts conn_data.send_string

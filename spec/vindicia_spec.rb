@@ -10,6 +10,20 @@ describe Vindicia::Account do
     a.wsdl.should be_equal(b.wsdl)
   end
   
+  describe '#new' do
+    it 'should handle nil' do
+      Vindicia::Account.new.ref.should == {'merchantAccountId' => nil}
+    end
+    
+    it 'should handle a string' do
+      Vindicia::Account.new('thing').ref.should == {'merchantAccountId' => 'thing'}
+    end
+    
+    it 'should handle a hash' do
+      Vindicia::Account.new(:merchantAccountId => 'thing').ref.should == {'merchantAccountId' => 'thing'}
+    end
+  end
+  
   describe '#update' do
     it 'should create/update an account' do
       account, created = Vindicia::Account.update({
@@ -34,14 +48,15 @@ describe Vindicia::Account do
     end
   end
   
-  describe '#find_by_merchant_id' do
+  describe '#find' do
     it 'should return an account' do
+      name = "bob#{rand(5000)}"
       Vindicia::Account.update({
         :merchantAccountId => '123',
-        :name => 'bob'
+        :name => name
       })
-      account = Vindicia::Account.find_by_merchant_id('123')
-      account.name.should == 'bob'
+      account = Vindicia::Account.find('123')
+      account.name.should == name
     end
   end
   
@@ -49,17 +64,12 @@ end
 
 describe Vindicia::Product do
   it 'should look up by merchant id' do
-    product = Vindicia::Product.find_by_merchant_id('em-2-PREMIUM-USD')
-    product.description.should == 'EM PREMIUM-USD Subscription'
-  end
-  
-  it 'should look up by VID' do
-    product = Vindicia::Product.find_by_vid('3ef764ca203485052c99db99401c0f5a1e9c03d4')
+    product = Vindicia::Product.find('em-2-PREMIUM-USD')
     product.description.should == 'EM PREMIUM-USD Subscription'
   end
   
   it 'should bundle the "Return" status in the Product' do
-    product = Vindicia::Product.find_by_merchant_id('em-2-PREMIUM-USD')
+    product = Vindicia::Product.find('em-2-PREMIUM-USD')
     product.request_status.code.should == 200
   end
 end
@@ -71,7 +81,7 @@ describe Vindicia do
       :merchantAccountId => Time.now.to_i.to_s,
       :name => "Integration User #{Time.now.to_i}"
     })
-    @account, validated = Vindicia::Account.updatePaymentMethod(account.vid_reference, {
+    @account, validated = Vindicia::Account.updatePaymentMethod(account.ref, {
       # Payment Method
       :type => 'CreditCard',
       :creditCard => {
@@ -93,13 +103,13 @@ describe Vindicia do
 
   describe Vindicia::AutoBill do
     it 'create recurring billing' do
-      @product = Vindicia::Product.find_by_merchant_id('em-2-PREMIUM-USD')
-      @billing = Vindicia::BillingPlan.find_by_merchant_id('em-2-PREMIUM-USD')
+      @product = Vindicia::Product.new('em-2-PREMIUM-USD')
+      @billing = Vindicia::BillingPlan.new('em-2-PREMIUM-USD')
       autobill, created, authstatus, firstBillDate, firstBillAmount, firstBillingCurrency = \
       Vindicia::AutoBill.update({
-        :account => @account.vid_reference,
-        :product => @product.vid_reference,
-        :billingPlan => @billing.vid_reference
+        :account => @account.ref,
+        :product => @product.ref,
+        :billingPlan => @billing.ref
       })
     
       autobill.request_status.code.should == 200
@@ -109,10 +119,12 @@ describe Vindicia do
   describe Vindicia::Transaction do
     describe '#auth' do
       it 'should auth a purchase' do
+        payment_vid = @account.paymentMethods.first['VID']
         transaction = Vindicia::Transaction.auth({
-          :amount                 => 49.00,
+          :account                => @account.ref,
           :merchantTransactionId  => "Purchase.id (#{Time.now.to_i})",
-          :account                => @account.vid_reference,
+          :sourcePaymentMethod    => {:VID => payment_vid},
+          :amount                 => 49.00,
           :transactionItems       => [{:sku => 'sku', :name => 'Established Men Subscription', :price => 49.00, :quantity => 1}]
           #:divisionNumber                xsd:string
           #:userAgent                     xsd:string
@@ -120,15 +132,47 @@ describe Vindicia do
           #:sourceIp                      xsd:string
           #:billingStatementIdentifier    xsd:string
         })
-        p transaction
         transaction.request_status.code.should == 200
       end
     end
 
     describe '#capture' do
+      before :each do
+        payment_vid = @account.paymentMethods.first['VID']
+        @transaction = Vindicia::Transaction.auth({
+          :account                => @account.ref,
+          :merchantTransactionId  => "Purchase.id (#{Time.now.to_i})",
+          :sourcePaymentMethod    => {:VID => payment_vid},
+          :amount                 => 49.00,
+          :transactionItems       => [{:sku => 'sku', :name => 'Established Men Subscription', :price => 49.00, :quantity => 1}]
+        })
+      end
+      
+      it 'should capture an authorized purchase' do
+        ret, success, fail, results = Vindicia::Transaction.capture([@transaction.ref])
+        success.should == 1
+        results.first.merchantTransactionId.should == @transaction.merchantTransactionId
+        results.first.returnCode.should == 200
+        
+        pending 'a way to force immediate capturing'
+        transaction = Vindicia::Transaction.find(@transaction.merchantTransactionId)
+        transaction.statusLog.first['status'].should == 'Captured'
+      end
     end
 
     describe '#authCapture' do
+      it 'should return a captured transaction' do
+        payment_vid = @account.paymentMethods.first['VID']
+        transaction = Vindicia::Transaction.authCapture({
+          :account                => @account.ref,
+          :merchantTransactionId  => "Purchase.id (#{Time.now.to_i})",
+          :sourcePaymentMethod    => {:VID => payment_vid},
+          :amount                 => 49.00,
+          :transactionItems       => [{:sku => 'sku', :name => 'Established Men Subscription', :price => 49.00, :quantity => 1}]
+        })
+        pending 'a way to force immediate capturing'
+        transaction.statusLog.first['status'].should == 'Captured'
+      end
     end
   end
 end
