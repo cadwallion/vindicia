@@ -37,11 +37,6 @@ module Vindicia
   end
   
   module SoapClient
-    def self.extended(base)
-      base.returns :fetchByVid, base
-      base.returns :"fetchByMerchant#{name}Id", base
-    end
-    
     def default(method, *defaults)
       @defaults ||= {}
       @defaults[method] = defaults
@@ -112,17 +107,6 @@ module Vindicia
       @required_fields || []
     end
     
-    def returns(method, *classes)
-      return_mappings[method] += classes
-    end
-    def return_mappings
-      @return_mappings ||= begin
-        map = Hash.new([Return])
-        map[:"fetchByMerchant#{name}Id"] += [self]
-        map
-      end
-    end
-  
     def soap
       @soap ||= begin
         s = wsdl.create_rpc_driver
@@ -201,17 +185,13 @@ module Vindicia
   class Account < SoapObject
     extend SoapClient
     
-    returns :update, Account, :boolean
-    
     default :updatePaymentMethod, {}, {}, true, 'Update', nil
-    returns :updatePaymentMethod, Account, :boolean
   end
   
   class AutoBill < SoapObject
     extend SoapClient
     
     default :update, {}, 'Fail', true, 100
-    returns :update, AutoBill, :boolean, TransactionStatus, :date, :decimal, :string
   end
 
   class BillingPlan < SoapObject
@@ -226,12 +206,7 @@ module Vindicia
     extend SoapClient
 
     default :auth, {}, 100, false
-    returns :auth, Transaction
-    
     default :authCapture, {}, false
-    returns :authCapture, Transaction
-    
-    returns :capture, :int, :int, [CaptureResult]
   end
 
   # TODO:
