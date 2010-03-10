@@ -1,6 +1,8 @@
 require 'soap/wsdlDriver'
 
 module Vindicia
+  NAMESPACE = "http://soap.vindicia.com/Vindicia"
+  
   class << self
     attr_reader :login, :password, :environment
     def authenticate(login, pass, env=:prodtest)
@@ -40,22 +42,6 @@ module Vindicia
       base.returns :"fetchByMerchant#{name}Id", base
     end
     
-    def coerce_returns_for(method, objects)
-      return_mappings[method].zip(objects).map do |c,o|
-        case c
-        when :boolean, :string, :date
-          o
-        when :decimal, :int
-          o.to_i
-        when Array
-          cls = c.first
-          o.map{|e|cls.new(e)}
-        else
-          c.new(o)
-        end
-      end
-    end
-    
     def default(method, *defaults)
       @defaults ||= {}
       @defaults[method] = defaults
@@ -82,7 +68,7 @@ module Vindicia
       
       with_soap do |soap|
         objs = soap.send(method, Vindicia.auth, *opts)
-        ret, *objs = coerce_returns_for(method, objs)
+        ret = objs.shift
         
         return [ret] + objs unless objs.first.is_a? SoapObject
         
@@ -162,22 +148,26 @@ module Vindicia
   
   class SoapObject
     include Comparable
-    attr_accessor :request_status, :values
+    attr_accessor :request_status
     
     def initialize(arg=nil)
-      @values = {}
       case arg
         when String
-          @values["merchant#{classname}Id"] = arg
+          instance_variable_set("@merchant#{classname}Id", arg)
         when Hash
           arg.each do |key, value|
-            @values[key.to_s] = value
+            instance_variable_set("@#{key}", value)
           end
         when SOAP::Mapping::Object
           arg.instance_variable_get('@__xmlele').each do |qname, value|
-            @values[qname.name] = value
+            instance_variable_set("@#{qname.name}", value)
           end
       end
+    end
+    
+    def VID
+      # WSDL Driver conveniently downcases initial char
+      self.vID
     end
     
     def classname
@@ -185,8 +175,8 @@ module Vindicia
     end
     
     def method_missing(method, *args)
-      if @values.has_key? method.to_s
-        @values[method.to_s]
+      if instance_variable_defined?("@#{method}")
+        instance_variable_get("@#{method}")
       else
         super
       end
@@ -196,7 +186,7 @@ module Vindicia
     
     def ref
       key = "merchant#{classname}Id"
-      {key => @values[key] || @values[key.to_sym]}
+      {key => instance_variable_get("@#{key}")}
     end
   end
   
@@ -249,7 +239,10 @@ module Vindicia
   # Address
   # Chargeback
   # Entitlement
-  # PaymentMethod
+  
+  class PaymentMethod < SoapObject
+  end
+  
   # PaymentProvider
   # Refund
   
@@ -261,7 +254,36 @@ class WSDL::XMLSchema::SimpleRestriction
   end
 end
 
+module SOAP::Mapping
+  def self.const_from_name(name, lenient = false)
+    const = ::Object
+    # Monkeypatch below
+    # Scope unknown class lookups inside our namespace to
+    # prevent conflicts with applications defining their own
+    # Account, CreditCard, etc. classes.
+    const = ::Vindicia unless name =~ /\A::/
+    # Monkeypatch above
+    name.sub(/\A::/, '').split('::').each do |const_str|
+      if XSD::CodeGen::GenSupport.safeconstname?(const_str)
+        if const.const_defined?(const_str)
+          const = const.const_get(const_str)
+          next
+        end
+      elsif lenient
+        const_str = XSD::CodeGen::GenSupport.safeconstname(const_str)
+        if const.const_defined?(const_str)
+          const = const.const_get(const_str)
+          next
+        end
+      end
+      return nil
+    end
+    const
+  end
+end
+
 if false
+  # make above 'if true' to add debug output of XML going across the wire
   class SOAP::HTTPStreamHandler
     def send(endpoint_url, conn_data, soapaction = nil, charset = @charset)
       puts conn_data.send_string
@@ -270,4 +292,3 @@ if false
     end
   end
 end
-

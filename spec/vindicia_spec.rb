@@ -100,9 +100,13 @@ describe Vindicia do
       :merchantPaymentMethodId => "Purchase.id #{Time.now.to_i}"
     })
   end
+  
+  it 'should map payment method to a Vindicia:: class' do
+    @account.paymentMethods.first.class.should == Vindicia::PaymentMethod
+  end
 
   describe Vindicia::AutoBill do
-    it 'create recurring billing' do
+    it 'should create recurring billing' do
       @product = Vindicia::Product.new('em-2-PREMIUM-USD')
       @billing = Vindicia::BillingPlan.new('em-2-PREMIUM-USD')
       autobill, created, authstatus, firstBillDate, firstBillAmount, firstBillingCurrency = \
@@ -119,7 +123,7 @@ describe Vindicia do
   describe Vindicia::Transaction do
     describe '#auth' do
       it 'should auth a purchase' do
-        payment_vid = @account.paymentMethods.first['VID']
+        payment_vid = @account.paymentMethods.first.VID
         transaction = Vindicia::Transaction.auth({
           :account                => @account.ref,
           :merchantTransactionId  => "Purchase.id (#{Time.now.to_i})",
@@ -138,7 +142,7 @@ describe Vindicia do
 
     describe '#capture' do
       before :each do
-        payment_vid = @account.paymentMethods.first['VID']
+        payment_vid = @account.paymentMethods.first.VID
         @transaction = Vindicia::Transaction.auth({
           :account                => @account.ref,
           :merchantTransactionId  => "Purchase.id (#{Time.now.to_i})",
@@ -162,7 +166,7 @@ describe Vindicia do
 
     describe '#authCapture' do
       it 'should return a captured transaction' do
-        payment_vid = @account.paymentMethods.first['VID']
+        payment_vid = @account.paymentMethods.first.VID
         transaction = Vindicia::Transaction.authCapture({
           :account                => @account.ref,
           :merchantTransactionId  => "Purchase.id (#{Time.now.to_i})",
