@@ -172,22 +172,31 @@ module Vindicia
       key = "merchant#{classname}Id"
       {key => instance_variable_get("@#{key}")}
     end
+    
+    def values
+      instance_variables.inject({}) do |result, ivar|
+        name = ivar[1..-1]
+        result[name] = instance_variable_get(ivar)
+        result
+      end
+    end
   end
   
-  class Return < SoapObject
-    def code; self.returnCode.to_i; end
-    def response; self.returnString; end
-  end
-
-  class CaptureResult < SoapObject ; end
-  class TransactionStatus < SoapObject ; end
-  
+  # API classes
   class Account < SoapObject
     extend SoapClient
     
     default :updatePaymentMethod, {}, {}, true, 'Update', nil
   end
   
+  class Activity < SoapObject
+    extend SoapClient
+  end
+
+  class Address < SoapObject
+    extend SoapClient
+  end
+
   class AutoBill < SoapObject
     extend SoapClient
     
@@ -198,10 +207,30 @@ module Vindicia
     extend SoapClient
   end
 
+  class Chargeback < SoapObject
+    extend SoapClient
+  end
+
+  class Entitlement < SoapObject
+    extend SoapClient
+  end
+
+  class PaymentMethod < SoapObject
+    extend SoapClient
+  end
+
+  class PaymentProvider < SoapObject
+    extend SoapClient
+  end
+
   class Product < SoapObject
     extend SoapClient
   end
   
+  class Refund < SoapObject
+    extend SoapClient
+  end
+
   class Transaction < SoapObject
     extend SoapClient
 
@@ -209,18 +238,16 @@ module Vindicia
     default :authCapture, {}, false
   end
 
-  # TODO:
-  # Activity
-  # Address
-  # Chargeback
-  # Entitlement
-  
-  class PaymentMethod < SoapObject
+  # customized data classes
+  class Return < SoapObject
+    def code; self.returnCode.to_i; end
+    def response; self.returnString; end
   end
-  
-  # PaymentProvider
-  # Refund
-  
+
+  # Stub data classes
+  class CaptureResult     < SoapObject ; end
+  class CreditCard        < SoapObject ; end
+  class TransactionStatus < SoapObject ; end
 end
 
 class WSDL::XMLSchema::SimpleRestriction
