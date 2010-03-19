@@ -58,24 +58,18 @@ module Vindicia
       args << nil while args.size < defaults.size
       
       opts = args.zip(defaults).map do |arg, default|
-        default.is_a?(Hash) ? default.merge(arg||{}, &r_merge) : arg || default
+        default.is_a?(Hash) ? default.merge(arg||{}) : arg || default
       end
       
       with_soap do |soap|
         objs = soap.send(method, Vindicia.auth, *opts)
+        return objs unless objs[1].is_a? SoapObject
+
         ret = objs.shift
-        
-        return [ret] + objs unless objs.first.is_a? SoapObject
-        
-        case objs.size
-        when 0
-          ret.request_status = ret
-          ret
-        when 1
-          objs.first.request_status = ret
+        objs.first.request_status = ret
+        if objs.size == 1
           objs.first
         else
-          objs.first.request_status = ret
           objs
         end
       end
@@ -92,19 +86,6 @@ module Vindicia
       ret = yield
       $stderr = stderr
       ret
-    end
-    
-    def r_merge
-      @r_merge ||= proc do |key,v1,v2|
-        Hash === v1 && Hash === v2 ? v1.merge(v2, &r_merge) : v2
-      end
-    end
-    
-    def required(*fields)
-      @required_fields = fields
-    end
-    def required_fields
-      @required_fields || []
     end
     
     def soap
@@ -141,10 +122,6 @@ module Vindicia
         when Hash
           arg.each do |key, value|
             instance_variable_set("@#{key}", value)
-          end
-        when SOAP::Mapping::Object
-          arg.instance_variable_get('@__xmlele').each do |qname, value|
-            instance_variable_set("@#{qname.name}", value)
           end
       end
     end
