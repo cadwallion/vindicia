@@ -27,9 +27,18 @@ describe Vindicia::Account do
   describe '#update' do
     it 'should create/update an account' do
       account, created = Vindicia::Account.update({
-        :merchantAccountId => "123",
+        :merchantAccountId => "bob#{Time.now.to_i}",
         :name => "bob"
       })
+      account.VID.should =~ /^[0-9a-f]{40}$/
+    end
+    
+    it 'should accept raw objects' do
+      account, created = Vindicia::Account.update(Vindicia::Account.new({
+        :merchantAccountId => "bob#{Time.now.to_i}",
+        :name => "long"
+      }))
+      account.name.should == "long"
       account.VID.should =~ /^[0-9a-f]{40}$/
     end
 
@@ -50,7 +59,7 @@ describe Vindicia::Account do
   
   describe '#find' do
     it 'should return an account' do
-      name = "bob#{rand(5000)}"
+      name = "bob#{Time.now.to_i}"
       Vindicia::Account.update({
         :merchantAccountId => '123',
         :name => name
