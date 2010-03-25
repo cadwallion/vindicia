@@ -8,7 +8,7 @@ module Vindicia
     def authenticate(login, pass, env=:prodtest)
       @login       = login
       @password    = pass
-      @environment = env
+      @environment = env.to_s
     end
     
     def version
@@ -21,9 +21,9 @@ module Vindicia
     
     def domain
       case @environment
-      when :prodtest  ; "soap.prodtest.sj.vindicia.com"
-      when :staging   ; "soap.staging.sj.vindicia.com"
-      when :production; "soap.vindicia.com"
+      when 'prodtest'  ; "soap.prodtest.sj.vindicia.com"
+      when 'staging'   ; "soap.staging.sj.vindicia.com"
+      when 'production'; "soap.vindicia.com"
       end
     end
     
@@ -37,32 +37,13 @@ module Vindicia
   end
   
   module SoapClient
-    def default(method, *defaults)
-      @defaults ||= {}
-      @defaults[method] = defaults
-    end
-    
-    def defaults_for(method)
-      @defaults ||= {}
-      @defaults[method] || []
-    end
-    
     def find(id)
       self.send(:"fetchByMerchant#{name}Id", id)
     end
 
     def method_missing(method, *args)
-      # Need to make args and defaults the same size to zip() properly
-      defaults = defaults_for(method)
-      defaults << nil while defaults.size < args.size
-      args << nil while args.size < defaults.size
-      
-      opts = args.zip(defaults).map do |arg, default|
-        default.is_a?(Hash) ? default.merge(arg||{}) : arg || default
-      end
-      
       with_soap do |soap|
-        objs = soap.send(method, Vindicia.auth, *opts)
+        objs = soap.send(method, Vindicia.auth, *args)
         return objs unless objs[1].is_a? SoapObject
 
         ret = objs.shift
@@ -160,14 +141,10 @@ module Vindicia
   end
   
   # API classes
-  class Account           < SoapObject; extend SoapClient
-    default :updatePaymentMethod, {}, {}, true, 'Update', nil
-  end
+  class Account           < SoapObject; extend SoapClient end
   class Activity          < SoapObject; extend SoapClient end
   class Address           < SoapObject; extend SoapClient end
-  class AutoBill          < SoapObject; extend SoapClient
-    default :update, {}, 'Fail', true, 100
-  end
+  class AutoBill          < SoapObject; extend SoapClient end
   class BillingPlan       < SoapObject; extend SoapClient end
   class Chargeback        < SoapObject; extend SoapClient end
   class Entitlement       < SoapObject; extend SoapClient end
@@ -175,10 +152,7 @@ module Vindicia
   class PaymentProvider   < SoapObject; extend SoapClient end
   class Product           < SoapObject; extend SoapClient end
   class Refund            < SoapObject; extend SoapClient end
-  class Transaction       < SoapObject; extend SoapClient
-    default :auth, {}, 100, false
-    default :authCapture, {}, false
-  end
+  class Transaction       < SoapObject; extend SoapClient end
 
   # customized data classes
   class Return < SoapObject

@@ -107,7 +107,7 @@ describe Vindicia do
         :postalCode => 'M4V 5X7'
       },
       :merchantPaymentMethodId => "Purchase.id #{Time.now.to_i}"
-    })
+    }, true, 'Validate', nil)
   end
   
   it 'should map payment method to a Vindicia:: class' do
@@ -123,7 +123,7 @@ describe Vindicia do
         :account => @account.ref,
         :product => @product.ref,
         :billingPlan => @billing.ref
-      })
+      }, 'Fail', true, 100)
     
       autobill.request_status.code.should == 200
     end
@@ -144,7 +144,7 @@ describe Vindicia do
           #:sourceMacAddress              xsd:string
           #:sourceIp                      xsd:string
           #:billingStatementIdentifier    xsd:string
-        })
+        }, 100, false)
         transaction.request_status.code.should == 200
       end
     end
@@ -158,7 +158,7 @@ describe Vindicia do
           :sourcePaymentMethod    => {:VID => payment_vid},
           :amount                 => 49.00,
           :transactionItems       => [{:sku => 'sku', :name => 'Established Men Subscription', :price => 49.00, :quantity => 1}]
-        })
+        }, 100, false)
       end
       
       it 'should capture an authorized purchase' do
@@ -182,7 +182,7 @@ describe Vindicia do
           :sourcePaymentMethod    => {:VID => payment_vid},
           :amount                 => 49.00,
           :transactionItems       => [{:sku => 'sku', :name => 'Established Men Subscription', :price => 49.00, :quantity => 1}]
-        })
+        }, false)
         pending 'a way to force immediate capturing'
         transaction.statusLog.first['status'].should == 'Captured'
       end
