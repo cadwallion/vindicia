@@ -74,7 +74,7 @@ end
 describe Vindicia::Product do
   it 'should look up by merchant id' do
     product = Vindicia::Product.find('em-2-PREMIUM-USD')
-    product.description.should == 'EM PREMIUM-USD Subscription'
+    product.description.should == 'Premium (49.0 USD)'
   end
   
   it 'should bundle the "Return" status in the Product' do

@@ -131,10 +131,14 @@ module Vindicia
       {key => instance_variable_get("@#{key}")}
     end
     
-    def values
+    def to_hash
       instance_variables.inject({}) do |result, ivar|
         name = ivar[1..-1]
-        result[name] = instance_variable_get(ivar)
+        value = instance_variable_get(ivar)
+        if value.kind_of? SoapObject
+          value = value.to_hash
+        end
+        result[name] = value
         result
       end
     end
