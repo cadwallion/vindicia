@@ -135,8 +135,11 @@ module Vindicia
       instance_variables.inject({}) do |result, ivar|
         name = ivar[1..-1]
         value = instance_variable_get(ivar)
-        if value.kind_of? SoapObject
-          value = value.to_hash
+        case value
+        when SoapObject
+           value = value.to_hash
+        when Array
+          value = value.map{|e| e.kind_of?(SoapObject) ? e.to_hash : e}
         end
         result[name] = value
         result
