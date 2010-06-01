@@ -2,7 +2,7 @@ require 'soap/wsdlDriver'
 
 module Vindicia
   NAMESPACE = "http://soap.vindicia.com/Vindicia"
-  
+
   class << self
     attr_reader :login, :password, :environment
     def authenticate(login, pass, env=:prodtest)
@@ -10,7 +10,7 @@ module Vindicia
       @password    = pass
       @environment = env.to_s
     end
-    
+
     def version
       '3.4'
     end
@@ -18,7 +18,7 @@ module Vindicia
     def auth
       {'version' => version, 'login' => login, 'password' => password}
     end
-    
+
     def domain
       case @environment
       when 'prodtest'  ; "soap.prodtest.sj.vindicia.com"
@@ -26,16 +26,16 @@ module Vindicia
       when 'production'; "soap.vindicia.com"
       end
     end
-    
+
     def endpoint
       "https://#{domain}/v#{version}/soap.pl"
     end
-    
+
     def wsdl(object)
       "http://#{domain}/#{version}/#{object}.wsdl"
     end
   end
-  
+
   module SoapClient
     def find(id)
       self.send(:"fetchByMerchant#{name}Id", id)
@@ -44,22 +44,28 @@ module Vindicia
     def method_missing(method, *args)
       with_soap do |soap|
         objs = soap.send(method, Vindicia.auth, *args)
-        return objs unless objs[1].is_a? SoapObject
-
         ret = objs.shift
-        objs.first.request_status = ret
-        if objs.size == 1
+
+        return [ret] + objs unless objs.first.is_a? SoapObject
+
+        case objs.size
+        when 0
+          ret.request_status = ret
+          ret
+        when 1
+          objs.first.request_status = ret
           objs.first
         else
+          objs.first.request_status = ret
           objs
         end
       end
     end
-    
+
     def name
       self.to_s.split('::').last
     end
-    
+
     def quietly
       # Squelch warnings on stderr
       stderr = $stderr
@@ -68,7 +74,20 @@ module Vindicia
       $stderr = stderr
       ret
     end
-    
+
+    def r_merge
+      @r_merge ||= proc do |key,v1,v2|
+        Hash === v1 && Hash === v2 ? v1.merge(v2, &r_merge) : v2
+      end
+    end
+
+    def required(*fields)
+      @required_fields = fields
+    end
+    def required_fields
+      @required_fields || []
+    end
+
     def soap
       @soap ||= begin
         s = wsdl.create_rpc_driver
@@ -84,18 +103,18 @@ module Vindicia
       soap.reset_stream
       ret
     end
-  
+
     def wsdl
       @wsdl ||= quietly do
         SOAP::WSDLDriverFactory.new(Vindicia.wsdl(name))
       end
     end
   end
-  
+
   class SoapObject
     include Comparable
     attr_accessor :request_status
-    
+
     def initialize(arg=nil)
       case arg
         when String
@@ -104,18 +123,22 @@ module Vindicia
           arg.each do |key, value|
             instance_variable_set("@#{key}", value)
           end
+        when SOAP::Mapping::Object
+          arg.instance_variable_get('@__xmlele').each do |qname, value|
+            instance_variable_set("@#{qname.name}", value)
+          end
       end
     end
-    
+
     def VID
       # WSDL Driver conveniently downcases initial char
       self.vID
     end
-    
+
     def classname
       self.class.name
     end
-    
+
     def method_missing(method, *args)
       if instance_variable_defined?("@#{method}")
         instance_variable_get("@#{method}")
@@ -123,21 +146,21 @@ module Vindicia
         super
       end
     end
-    
+
     # TODO: respond_to?
-    
+
     def ref
       key = "merchant#{classname}Id"
       {key => instance_variable_get("@#{key}")}
     end
-    
+
     def to_hash
       instance_variables.inject({}) do |result, ivar|
         name = ivar[1..-1]
         value = instance_variable_get(ivar)
         case value
         when SoapObject
-           value = value.to_hash
+          value = value.to_hash
         when Array
           value = value.map{|e| e.kind_of?(SoapObject) ? e.to_hash : e}
         end
@@ -146,7 +169,7 @@ module Vindicia
       end
     end
   end
-  
+
   # API classes
   class Account           < SoapObject; extend SoapClient end
   class Activity          < SoapObject; extend SoapClient end
