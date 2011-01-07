@@ -1,5 +1,4 @@
-require 'lib/vindicia'
-require 'spec'
+require 'vindicia'
 
 require 'spec/authenticate'
 
