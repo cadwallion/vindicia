@@ -1,4 +1,5 @@
-require 'soap/wsdlDriver'
+require 'savon'
+require 'savon_patches'
 
 module Vindicia
   NAMESPACE = "http://soap.vindicia.com/Vindicia"
@@ -43,7 +44,15 @@ module Vindicia
 
     def method_missing(method, *args)
       with_soap do |soap|
-        objs = soap.send(method, Vindicia.auth, *args)
+        response = soap.request(:wsdl, method) do |soap, wsdl|
+          keys = wsdl.arg_list["#{method}_in"].map{|arg|arg["name"]}
+          soap.body = Hash[keys.zip([Vindicia.auth] + args)]
+        end
+        # TODO: Fix XML parsing - vindicia response does not define xsi namespace :(
+        # TODO: wrap output objects in classes (maybe replace SoapObject with BasicObject subclass)
+        objs = response.to_array
+        pp Crack::XML.parse(response.to_xml)
+        STDOUT.flush
         ret = objs.shift
 
         return [ret] + objs unless objs.first.is_a? SoapObject
@@ -90,11 +99,20 @@ module Vindicia
 
     def soap
       @soap ||= begin
-        s = wsdl.create_rpc_driver
-        # prodtest/staging wsdl point to production urls, so correct them
-        s.proxy.instance_variable_set('@endpoint_url', Vindicia.endpoint)
-        s.wiredump_dev = STDERR if $DEBUG
-        s
+        Savon::Client.new do |wsdl|
+          wsdl.document = Vindicia.wsdl(name)
+          # Test WSDL files contain production endpoints, must override
+          wsdl.endpoint = Vindicia.endpoint
+
+          # Be sure to parse arg lists for revification
+          def wsdl.parser
+            @parser ||= begin
+              parser = WSDLParserWithArgList.new
+              REXML::Document.parse_stream self.document, parser
+              parser
+            end
+          end
+        end
       end
     end
 
@@ -102,12 +120,6 @@ module Vindicia
       ret = quietly { yield soap }
       soap.reset_stream
       ret
-    end
-
-    def wsdl
-      @wsdl ||= quietly do
-        SOAP::WSDLDriverFactory.new(Vindicia.wsdl(name))
-      end
     end
   end
 
@@ -123,10 +135,10 @@ module Vindicia
           arg.each do |key, value|
             instance_variable_set("@#{key}", value)
           end
-        when SOAP::Mapping::Object
-          arg.instance_variable_get('@__xmlele').each do |qname, value|
-            instance_variable_set("@#{qname.name}", value)
-          end
+#        when SOAP::Mapping::Object
+#          arg.instance_variable_get('@__xmlele').each do |qname, value|
+#            instance_variable_set("@#{qname.name}", value)
+#          end
       end
     end
 
@@ -233,39 +245,39 @@ module Vindicia
   class WebSession                    < SoapObject ; end
 end
 
-class WSDL::XMLSchema::SimpleRestriction
-  def check_restriction(value)
-    @enumeration.empty? or @enumeration.include?(value) or value.nil?
-  end
-end
-
-module SOAP::Mapping
-  def self.const_from_name(name, lenient = false)
-    const = ::Object
-    # Monkeypatch below
-    # Scope unknown class lookups inside our namespace to
-    # prevent conflicts with applications defining their own
-    # Account, CreditCard, etc. classes.
-    const = ::Vindicia unless name =~ /\A::/
-    # Monkeypatch above
-    name.sub(/\A::/, '').split('::').each do |const_str|
-      if XSD::CodeGen::GenSupport.safeconstname?(const_str)
-        if const.const_defined?(const_str)
-          const = const.const_get(const_str)
-          next
-        end
-      elsif lenient
-        const_str = XSD::CodeGen::GenSupport.safeconstname(const_str)
-        if const.const_defined?(const_str)
-          const = const.const_get(const_str)
-          next
-        end
-      end
-      return nil
-    end
-    const
-  end
-end
+# class WSDL::XMLSchema::SimpleRestriction
+#   def check_restriction(value)
+#     @enumeration.empty? or @enumeration.include?(value) or value.nil?
+#   end
+# end
+#
+# module SOAP::Mapping
+#   def self.const_from_name(name, lenient = false)
+#     const = ::Object
+#     # Monkeypatch below
+#     # Scope unknown class lookups inside our namespace to
+#     # prevent conflicts with applications defining their own
+#     # Account, CreditCard, etc. classes.
+#     const = ::Vindicia unless name =~ /\A::/
+#     # Monkeypatch above
+#     name.sub(/\A::/, '').split('::').each do |const_str|
+#       if XSD::CodeGen::GenSupport.safeconstname?(const_str)
+#         if const.const_defined?(const_str)
+#           const = const.const_get(const_str)
+#           next
+#         end
+#       elsif lenient
+#         const_str = XSD::CodeGen::GenSupport.safeconstname(const_str)
+#         if const.const_defined?(const_str)
+#           const = const.const_get(const_str)
+#           next
+#         end
+#       end
+#       return nil
+#     end
+#     const
+#   end
+# end
 
 if false
   # make above 'if true' to add debug output of XML going across the wire
