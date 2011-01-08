@@ -43,31 +43,45 @@ module Vindicia
     end
 
     def method_missing(method, *args)
-      with_soap do |soap|
-        response = soap.request(:wsdl, method) do |soap, wsdl|
-          keys = wsdl.arg_list["#{method}_in"].map{|arg|arg["name"]}
-          soap.body = Hash[keys.zip([Vindicia.auth] + args)]
-        end
-        # TODO: Fix XML parsing - vindicia response does not define xsi namespace :(
-        # TODO: wrap output objects in classes (maybe replace SoapObject with BasicObject subclass)
-        objs = response.to_array
-        pp Crack::XML.parse(response.to_xml)
-        STDOUT.flush
-        ret = objs.shift
+      response = soap.request(:wsdl, method) do |soap, wsdl|
+        soap.body = begin
+          xml = Builder::XmlMarkup.new
 
-        return [ret] + objs unless objs.first.is_a? SoapObject
+          wsdl.arg_list["#{method}_in"].zip([Vindicia.auth] + args).each do |arg, data|
+            case data
+            when Hash
+              obj = Vindicia.const_get(arg["type"].split(':').last).new(data) rescue data
+              obj.build(xml, arg["name"])
+            when SoapObject
+              data.build(xml, arg["name"])
+            else
+              xml.tag!(arg["name"], data)
+            end
+          end
 
-        case objs.size
-        when 0
-          ret.request_status = ret
-          ret
-        when 1
-          objs.first.request_status = ret
-          objs.first
-        else
-          objs.first.request_status = ret
-          objs
+          xml.target!
         end
+
+      end
+
+      objs = response.to_hash[:"#{method}_response"].values[0..-2].map{|value| # drop last entry
+        Vindicia.const_get(value[:type].split(':').last).new(value) rescue value
+      }
+
+      ret = objs.shift
+
+      return [ret] + objs unless objs.first.is_a? SoapObject
+
+      case objs.size
+      when 0
+        ret.request_status = ret
+        ret
+      when 1
+        objs.first.request_status = ret
+        objs.first
+      else
+        objs.first.request_status = ret
+        objs
       end
     end
 
@@ -75,27 +89,18 @@ module Vindicia
       self.to_s.split('::').last
     end
 
-    def quietly
-      # Squelch warnings on stderr
-      stderr = $stderr
-      $stderr = StringIO.new
-      ret = yield
-      $stderr = stderr
-      ret
-    end
+    # def r_merge
+    #   @r_merge ||= proc do |key,v1,v2|
+    #     Hash === v1 && Hash === v2 ? v1.merge(v2, &r_merge) : v2
+    #   end
+    # end
 
-    def r_merge
-      @r_merge ||= proc do |key,v1,v2|
-        Hash === v1 && Hash === v2 ? v1.merge(v2, &r_merge) : v2
-      end
-    end
-
-    def required(*fields)
-      @required_fields = fields
-    end
-    def required_fields
-      @required_fields || []
-    end
+    # def required(*fields)
+    #   @required_fields = fields
+    # end
+    # def required_fields
+    #   @required_fields || []
+    # end
 
     def soap
       @soap ||= begin
@@ -104,22 +109,16 @@ module Vindicia
           # Test WSDL files contain production endpoints, must override
           wsdl.endpoint = Vindicia.endpoint
 
-          # Be sure to parse arg lists for revification
+          # Be sure to parse arg lists for revification w/ custom parser
           def wsdl.parser
             @parser ||= begin
-              parser = WSDLParserWithArgList.new
+              parser = Savon::WSDL::ParserWithArgList.new
               REXML::Document.parse_stream self.document, parser
               parser
             end
           end
         end
       end
-    end
-
-    def with_soap
-      ret = quietly { yield soap }
-      soap.reset_stream
-      ret
     end
   end
 
@@ -133,18 +132,23 @@ module Vindicia
           instance_variable_set("@merchant#{classname}Id", arg)
         when Hash
           arg.each do |key, value|
+            # TODO: if value is a hash with a :type key, wrap it as well
             instance_variable_set("@#{key}", value)
           end
-#        when SOAP::Mapping::Object
-#          arg.instance_variable_get('@__xmlele').each do |qname, value|
-#            instance_variable_set("@#{qname.name}", value)
-#          end
       end
     end
 
     def VID
-      # WSDL Driver conveniently downcases initial char
-      self.vID
+      self.vid
+    end
+
+    def build(xml, tag)
+      xml.tag!(tag, soap_type_info) do |xml|
+        instance_variables.each do |ivar|
+          name = ivar[1..-1]
+          xml.tag!(name, instance_variable_get(ivar))
+        end
+      end
     end
 
     def classname
@@ -164,6 +168,12 @@ module Vindicia
     def ref
       key = "merchant#{classname}Id"
       {key => instance_variable_get("@#{key}")}
+    end
+
+    def soap_type_info
+      { "xmlns:vin" => "http://soap.vindicia.com/Vindicia",
+        "xsi:type" =>  "vin:#{classname.split("::").last}"
+      }
     end
 
     def to_hash
