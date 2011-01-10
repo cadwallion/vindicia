@@ -1,5 +1,13 @@
 require 'savon'
 require 'savon_patches'
+require 'httpclient'
+
+Savon.configure do |config|
+#  config.log = false            # disable logging
+  #config.log_level = :info      # changing the log level
+  #config.logger = Rails.logger  # using the Rails logger
+  config.soap_version = 2
+end
 
 module Vindicia
   NAMESPACE = "http://soap.vindicia.com/Vindicia"
@@ -39,15 +47,21 @@ module Vindicia
 
   module SoapClient
     def find(id)
-      self.send(:"fetchByMerchant#{name}Id", id)
+      self.send(:"fetch_by_merchant_#{name.downcase}_id", id)
     end
 
     def method_missing(method, *args)
+      method = underscore(method.to_s).to_sym # back compatability from camelCase api
+      out_vars = nil # set up outside variable
+
       response = soap.request(:wsdl, method) do |soap, wsdl|
+        out_vars = wsdl.arg_list["#{method.to_s.lower_camelcase}_out"]
+        soap.namespaces["xmlns:vin"] = "http://soap.vindicia.com/Vindicia"
         soap.body = begin
           xml = Builder::XmlMarkup.new
 
-          wsdl.arg_list["#{method}_in"].zip([Vindicia.auth] + args).each do |arg, data|
+          key = "#{method.to_s.lower_camelcase}_in"
+          wsdl.arg_list[key].zip([Vindicia.auth] + args).each do |arg, data|
             case data
             when Hash
               obj = Vindicia.const_get(arg["type"].split(':').last).new(data) rescue data
@@ -55,18 +69,19 @@ module Vindicia
             when SoapObject
               data.build(xml, arg["name"])
             else
-              xml.tag!(arg["name"], data)
+              xml.tag!(arg["name"], data, "xsi:type" => arg["type"])
             end
           end
 
           xml.target!
         end
-
       end
 
-      objs = response.to_hash[:"#{method}_response"].values[0..-2].map{|value| # drop last entry
+      values = response.to_hash[:"#{method}_response"]
+      objs = out_vars.map do |var|
+        value = values[var["name"].to_sym]
         Vindicia.const_get(value[:type].split(':').last).new(value) rescue value
-      }
+      end
 
       ret = objs.shift
 
@@ -120,6 +135,17 @@ module Vindicia
         end
       end
     end
+
+  private
+    def underscore(camel_cased_word)
+      word = camel_cased_word.to_s.dup
+      word.gsub!(/::/, '/')
+      word.gsub!(/([A-Z]+)([A-Z][a-z])/,'\1_\2')
+      word.gsub!(/([a-z\d])([A-Z])/,'\1_\2')
+      word.tr!("-", "_")
+      word.downcase!
+      word
+    end
   end
 
   class SoapObject
@@ -156,6 +182,7 @@ module Vindicia
     end
 
     def method_missing(method, *args)
+      method = underscore(method.to_s).to_sym # back compatability from camelCase api
       if instance_variable_defined?("@#{method}")
         instance_variable_get("@#{method}")
       else
@@ -166,14 +193,13 @@ module Vindicia
     # TODO: respond_to?
 
     def ref
-      key = "merchant#{classname}Id"
-      {key => instance_variable_get("@#{key}")}
+      key = instance_variable_get("@merchant#{classname}Id")
+      ukey = instance_variable_get("@merchant_#{underscore(classname)}_id")
+      {"merchant#{classname}Id" => ukey || key}
     end
 
     def soap_type_info
-      { "xmlns:vin" => "http://soap.vindicia.com/Vindicia",
-        "xsi:type" =>  "vin:#{classname.split("::").last}"
-      }
+      {"xsi:type" =>  "vin:#{classname.split("::").last}"}
     end
 
     def to_hash
@@ -189,6 +215,17 @@ module Vindicia
         result[name] = value
         result
       end
+    end
+
+  private
+    def underscore(camel_cased_word)
+      word = camel_cased_word.to_s.dup
+      word.gsub!(/::/, '/')
+      word.gsub!(/([A-Z]+)([A-Z][a-z])/,'\1_\2')
+      word.gsub!(/([a-z\d])([A-Z])/,'\1_\2')
+      word.tr!("-", "_")
+      word.downcase!
+      word
     end
   end
 
@@ -208,8 +245,8 @@ module Vindicia
 
   # customized data classes
   class Return < SoapObject
-    def code; self.returnCode.to_i; end
-    def response; self.returnString; end
+    def code; self.return_code.to_i; end
+    def response; self.return_string; end
   end
 
   # Stub data types
@@ -253,49 +290,4 @@ module Vindicia
   class TransactionStatusECP          < SoapObject ; end
   class TransactionStatusPayPal       < SoapObject ; end
   class WebSession                    < SoapObject ; end
-end
-
-# class WSDL::XMLSchema::SimpleRestriction
-#   def check_restriction(value)
-#     @enumeration.empty? or @enumeration.include?(value) or value.nil?
-#   end
-# end
-#
-# module SOAP::Mapping
-#   def self.const_from_name(name, lenient = false)
-#     const = ::Object
-#     # Monkeypatch below
-#     # Scope unknown class lookups inside our namespace to
-#     # prevent conflicts with applications defining their own
-#     # Account, CreditCard, etc. classes.
-#     const = ::Vindicia unless name =~ /\A::/
-#     # Monkeypatch above
-#     name.sub(/\A::/, '').split('::').each do |const_str|
-#       if XSD::CodeGen::GenSupport.safeconstname?(const_str)
-#         if const.const_defined?(const_str)
-#           const = const.const_get(const_str)
-#           next
-#         end
-#       elsif lenient
-#         const_str = XSD::CodeGen::GenSupport.safeconstname(const_str)
-#         if const.const_defined?(const_str)
-#           const = const.const_get(const_str)
-#           next
-#         end
-#       end
-#       return nil
-#     end
-#     const
-#   end
-# end
-
-if false
-  # make above 'if true' to add debug output of XML going across the wire
-  class SOAP::HTTPStreamHandler
-    def send(endpoint_url, conn_data, soapaction = nil, charset = @charset)
-      puts conn_data.send_string
-      conn_data.soapaction ||= soapaction # for backward conpatibility
-      send_post(endpoint_url, conn_data, charset)
-    end
-  end
 end

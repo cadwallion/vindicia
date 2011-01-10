@@ -1,12 +1,11 @@
 require 'vindicia'
-
-require 'spec/authenticate'
+require 'authenticate'
 
 describe Vindicia::Account do
   it 'should return a singleton soap wrapper' do
     a = Vindicia::Account
     b = Vindicia::Account
-    a.wsdl.should be_equal(b.wsdl)
+    a.soap.should be_equal(b.soap)
   end
   
   describe '#new' do
@@ -20,6 +19,14 @@ describe Vindicia::Account do
     
     it 'should handle a hash' do
       Vindicia::Account.new(:merchantAccountId => 'thing').ref.should == {'merchantAccountId' => 'thing'}
+    end
+
+    it 'should handle multiple words' do
+      Vindicia::AutoBill.new(:merchantAutoBillId => 'thing').ref.should == {'merchantAutoBillId' => 'thing'}
+    end
+
+    it 'should handle underscored words' do
+      Vindicia::AutoBill.new(:merchant_auto_bill_id => 'thing').ref.should == {'merchantAutoBillId' => 'thing'}
     end
   end
   
