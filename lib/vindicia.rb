@@ -3,7 +3,7 @@ require 'savon_patches'
 require 'httpclient'
 
 Savon.configure do |config|
-#  config.log = false            # disable logging
+  config.log = false            # disable logging
   #config.log_level = :info      # changing the log level
   #config.logger = Rails.logger  # using the Rails logger
   config.soap_version = 2
@@ -30,9 +30,9 @@ module Vindicia
 
     def domain
       case @environment
-      when 'prodtest'  ; "soap.prodtest.sj.vindicia.com"
-      when 'staging'   ; "soap.staging.sj.vindicia.com"
       when 'production'; "soap.vindicia.com"
+      when 'staging'   ; "soap.staging.sj.vindicia.com"
+      else             ; "soap.prodtest.sj.vindicia.com"
       end
     end
 
@@ -40,8 +40,51 @@ module Vindicia
       "https://#{domain}/v#{version}/soap.pl"
     end
 
+    def xsd(klass)
+      require 'open-uri'
+      url = "http://#{domain}/#{version}/Vindicia.xsd"
+      @xsd_data ||= begin
+        doc = REXML::Document.new(open(url).read)
+        doc.root.get_elements("//xsd:complexType").inject({}){|memo, node|
+          memo[node.attributes["name"]] = node.get_elements("xsd:sequence/xsd:element").map{|e|e.attributes}
+          memo
+        }
+      end
+      @xsd_data[klass]
+    end
+
     def wsdl(object)
       "http://#{domain}/#{version}/#{object}.wsdl"
+    end
+
+    def sequence
+      @seq ||= 0
+    end
+    def sequence_reset
+      @seq = 0
+    end
+    def sequence_next
+      @seq ||= 0
+      @seq += 1
+    end
+
+    def type_of(arg)
+      case arg
+        when TrueClass, FalseClass
+          'xsd:boolean'
+        when String
+          'xsd:string'
+        when Fixnum
+          'xsd:int'
+        when Float #, Decimal
+          'xsd:decimal'
+        # TODO: 'xsd:long'
+        when Date, DateTime, Time
+          'xsd:dateTime'
+        #TODO: 'xsd:anyURI'
+        else
+          raise "Unknown type for #{arg.class}:#{arg.inspect}"
+      end
     end
   end
 
@@ -54,9 +97,9 @@ module Vindicia
       method = underscore(method.to_s).to_sym # back compatability from camelCase api
       out_vars = nil # set up outside variable
 
+      Vindicia.sequence_reset
       response = soap.request(:wsdl, method) do |soap, wsdl|
         out_vars = wsdl.arg_list["#{method.to_s.lower_camelcase}_out"]
-        soap.namespaces["xmlns:vin"] = "http://soap.vindicia.com/Vindicia"
         soap.body = begin
           xml = Builder::XmlMarkup.new
 
@@ -69,7 +112,12 @@ module Vindicia
             when SoapObject
               data.build(xml, arg["name"])
             else
-              xml.tag!(arg["name"], data, "xsi:type" => arg["type"])
+              opts = if data.nil?
+                {"xsi:nil" => true}
+              else
+                {"xsi:type" => Vindicia.type_of(data)} #arg["type"]}
+              end
+              xml.tag!(arg["name"], data, opts)
             end
           end
 
@@ -152,6 +200,10 @@ module Vindicia
     include Comparable
     attr_accessor :request_status
 
+    def attributes
+      Vindicia.xsd(self.class.to_s.split('::').last)
+    end
+
     def initialize(arg=nil)
       case arg
         when String
@@ -170,9 +222,41 @@ module Vindicia
 
     def build(xml, tag)
       xml.tag!(tag, soap_type_info) do |xml|
-        instance_variables.each do |ivar|
-          name = ivar[1..-1]
-          xml.tag!(name, instance_variable_get(ivar))
+        attributes.each do |attribute|
+          name = attribute["name"]
+          type = attribute["type"]
+          value = instance_variable_get("@#{underscore(name)}") || instance_variable_get("@#{name}")
+
+          if value.nil?
+            #next if attribute["minOccurs"] == '0'
+            attr = {"xsi:nil" => true} if value.nil?
+            xml.tag!(name, attr, value)
+            next
+          end
+
+          class_name = type.split(':').last
+          if type =~ /tns:/ and Vindicia.const_defined?(class_name)
+            klass = Vindicia.const_get(class_name)
+            klass.new(value).build(xml, name)
+            next
+          end
+
+          if value.kind_of? Hash
+            puts "hash, not object (#{type}):"
+            xml.tag!(name) do |x|
+              value.each do |k,v|
+                p [k,v]
+                if v
+                  # this xsi:type is optional
+                  x.tag!(k, {"xsi:type" => Vindicia.type_of(v)}, v)
+                else
+                  x.tag!(k, {"xsi:nil" => "true"})
+                end
+              end
+            end
+          else
+            xml.tag!(name, {"xsi:type" => Vindicia.type_of(value)}, value)
+          end
         end
       end
     end
@@ -184,7 +268,22 @@ module Vindicia
     def method_missing(method, *args)
       method = underscore(method.to_s).to_sym # back compatability from camelCase api
       if instance_variable_defined?("@#{method}")
-        instance_variable_get("@#{method}")
+        val = instance_variable_get("@#{method}")
+        begin
+          if val.key? :array_type
+            val = [val[method]].flatten.map do |e|
+              cls = e[:type].last.split(':').last
+              if Vindicia.const_defined?(cls)
+                Vindicia.const_get(cls).new(e)
+              else
+                e
+              end
+            end
+          end
+        rescue NoMethodError
+          # not a hash, obviously
+        end
+        val
       else
         super
       end
@@ -198,8 +297,13 @@ module Vindicia
       {"merchant#{classname}Id" => ukey || key}
     end
 
-    def soap_type_info
-      {"xsi:type" =>  "vin:#{classname.split("::").last}"}
+    def soap_type_info(type=nil)
+      type ||= classname.split('::').last
+      ns = Vindicia.sequence_next
+      {
+        "xmlns:n#{ns}"  => "http://soap.vindicia.com/Vindicia",
+        "xsi:type"      => "n#{ns}:#{type}"
+      }
     end
 
     def to_hash
