@@ -219,23 +219,27 @@ module Vindicia
       end
 
       arg.each do |key, value|
-        next if [:type, :xmlns, :array_type].include? key
+        if key == :type
+          # pull out namespaced values, leave "real" values for CreditCard (+others?)
+          value = [value].flatten.reject{|e|e =~ /:/}.first
+          next if value.nil?
+        end
+        next if [:xmlns, :array_type].include? key
         type = attributes[camelcase(key.to_s)]
         cast_as_soap_object(type, value) do |obj|
           value = obj
         end
 
+        key = underscore(key) # old camelCase back-compat
         instance_variable_set("@#{key}", value)
       end
-    end
-
-    def VID
-      self.vid
     end
 
     def build(xml, tag)
       xml.tag!(tag, soap_type_info) do |xml|
         attributes.each do |name, type|
+          next if name == 'vid'
+
           value = instance_variable_get("@#{underscore(name)}") || instance_variable_get("@#{name}")
 
           if value.nil?
@@ -304,27 +308,32 @@ module Vindicia
       self.class.name
     end
 
+    def each
+      attributes.each do |attr, type|
+        value = self.send(attr)
+        yield attr, value if value
+      end
+    end
+
     def key?(k)
       attributes.key?(k.to_s)
     end
 
     def method_missing(method, *args)
       method = underscore(method.to_s).to_sym # back compatability from camelCase api
-      if instance_variable_defined?("@#{method}")
+      key = camelcase(method.to_s)
+
+      if attributes[key]
         val = instance_variable_get("@#{method}")
-        begin
-          if val.key? :array_type
-            val = [val[method]].flatten.map do |e|
-              cls = e[:type].last.split(':').last
-              if Vindicia.const_defined?(cls)
-                Vindicia.const_get(cls).new(e)
-              else
-                e
-              end
+        if val.kind_of?(Hash) && val.key?(:array_type)
+          val = [val[method]].flatten.map do |e|
+            cls = e[:type].last.split(':').last
+            if Vindicia.const_defined?(cls)
+              Vindicia.const_get(cls).new(e)
+            else
+              e
             end
           end
-        rescue NoMethodError
-          # not a hash, obviously
         end
         val
       else
