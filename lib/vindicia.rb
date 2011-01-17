@@ -98,7 +98,8 @@ module Vindicia
       out_vars = nil # set up outside variable
 
       Vindicia.sequence_reset
-      response = soap.request(:wsdl, method) do |soap, wsdl|
+      Vindicia.sequence_next
+      response = soap.request(:n1, method) do |soap, wsdl|
         out_vars = wsdl.arg_list["#{method.to_s.lower_camelcase}_out"]
         soap.body = begin
           xml = Builder::XmlMarkup.new
@@ -201,18 +202,30 @@ module Vindicia
     attr_accessor :request_status
 
     def attributes
-      Vindicia.xsd(self.class.to_s.split('::').last)
+      key = self.class.to_s.split('::').last
+      @attributes ||= Vindicia.xsd(key).inject({}) do |memo, attr|
+        memo[attr["name"]] = attr["type"]
+        memo["vid"] = attr["type"] if attr["name"] == "VID" # oh, casing
+        memo
+      end
     end
 
     def initialize(arg=nil)
       case arg
-        when String
-          instance_variable_set("@merchant#{classname}Id", arg)
-        when Hash
-          arg.each do |key, value|
-            # TODO: if value is a hash with a :type key, wrap it as well
-            instance_variable_set("@#{key}", value)
-          end
+      when String, nil
+        arg = {"merchant#{classname}Id" => arg}
+      when Array
+        arg = Hash[arg]
+      end
+
+      arg.each do |key, value|
+        next if [:type, :xmlns, :array_type].include? key
+        type = attributes[camelcase(key.to_s)]
+        cast_as_soap_object(type, value) do |obj|
+          value = obj
+        end
+
+        instance_variable_set("@#{key}", value)
       end
     end
 
@@ -222,9 +235,7 @@ module Vindicia
 
     def build(xml, tag)
       xml.tag!(tag, soap_type_info) do |xml|
-        attributes.each do |attribute|
-          name = attribute["name"]
-          type = attribute["type"]
+        attributes.each do |name, type|
           value = instance_variable_get("@#{underscore(name)}") || instance_variable_get("@#{name}")
 
           if value.nil?
@@ -261,8 +272,40 @@ module Vindicia
       end
     end
 
+    def cast_as_soap_object(type, value)
+      return nil if type.nil? or value.nil?
+      return value unless type =~ /tns:/
+
+      if type =~ /ArrayOf/
+        type = singularize(type.sub('ArrayOf',''))
+
+        if value.kind_of?(Hash) && value[:array_type]
+          key = value.keys - [:type, :array_type, :xmlns]
+          value = value[key.first]
+        end
+        value = [value] unless value.kind_of? Array
+
+        ary = value.map{|e| cast_as_soap_object(type, e) }
+        yield ary if block_given?
+        return ary
+      end
+
+      class_name = type.split(':').last
+      if Vindicia.const_defined?(class_name)
+        obj = Vindicia.const_get(class_name).new(value)
+        yield obj if block_given?
+        return obj
+      else
+        value
+      end
+    end
+
     def classname
       self.class.name
+    end
+
+    def key?(k)
+      attributes.key?(k.to_s)
     end
 
     def method_missing(method, *args)
@@ -330,6 +373,17 @@ module Vindicia
       word.tr!("-", "_")
       word.downcase!
       word
+    end
+
+    def camelcase(underscored_word)
+      underscored_word.gsub(/_(.)/) do |m| m.upcase.sub('_','') end
+    end
+
+    def singularize(type)
+      # Specifically formulated for just the ArrayOf types in Vindicia
+      type.sub(/ies$/, 'y')
+      type.sub(/([sx])es$/, '\1')
+      type.sub(/s$/, '')
     end
   end
 

@@ -77,6 +77,61 @@ describe Vindicia::Account do
   
 end
 
+describe Vindicia::SoapObject do
+  it 'should map associated classes' do
+    product = Vindicia::Product.new(
+      :default_billing_plan => {:status => "Active"}
+    )
+    product.default_billing_plan.should be_kind_of(Vindicia::BillingPlan)
+  end
+
+  it 'should deserialze arrays' do
+    plan = Vindicia::BillingPlan.new(
+      :periods => [{
+        :quantity => "1"
+      }]
+    )
+    plan.periods.should be_kind_of(Array)
+    plan.periods.size.should == 1
+    plan.periods.first.should be_kind_of(Vindicia::BillingPlanPeriod)
+  end
+
+  it 'should deserialize arrays from soap' do
+    plan = Vindicia::BillingPlan.new(
+      :status => "Active",
+      :periods => {
+        :periods => {
+          :do_not_notify_first_bill => true,
+          :prices => {
+            :prices => {
+              :type     => "namesp32:BillingPlanPrice",
+              :xmlns    => "",
+              :currency => "USD",
+              :amount   => "49.00",
+              :price_list_name => {:type=>"xsd:string", :xmlns=>""}
+            },
+            :type  => "namesp32:ArrayOfBillingPlanPrices",
+            :xmlns => "",
+            :array_type => "namesp32:BillingPlanPrice[1]"
+          },
+          :type => ["Month", "namesp32:BillingPlanPeriod"],
+          :expire_warning_days => "0",
+          :quantity => "1",
+          :cycles => "0",
+          :xmlns => ""
+        },
+        :type => "namesp32:ArrayOfBillingPlanPeriods",
+        :xmlns => "",
+        :array_type => "namesp32:BillingPlanPeriod[1]"
+      }
+    )
+
+    plan.periods.should be_kind_of(Array)
+    plan.periods.size.should == 1
+    plan.periods.first.should be_kind_of(Vindicia::BillingPlanPeriod)
+  end
+end
+
 describe Vindicia::Product do
   it 'should look up by merchant id' do
     product = Vindicia::Product.find('em-2-PREMIUM-USD')
