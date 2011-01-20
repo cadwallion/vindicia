@@ -6,7 +6,7 @@ Savon.configure do |config|
   config.log = false            # disable logging
   #config.log_level = :info      # changing the log level
   #config.logger = Rails.logger  # using the Rails logger
-  config.soap_version = 2
+  config.soap_version = 1
 end
 
 module Vindicia
@@ -108,8 +108,12 @@ module Vindicia
           wsdl.arg_list[key].zip([Vindicia.auth] + args).each do |arg, data|
             case data
             when Hash
-              obj = Vindicia.const_get(arg["type"].split(':').last).new(data) rescue data
-              obj.build(xml, arg["name"])
+              begin
+                obj = Vindicia.const_get(arg["type"].split(':').last).new(data)
+                obj.build(xml, arg["name"])
+              rescue
+                data
+              end
             when SoapObject
               data.build(xml, arg["name"])
             else
@@ -352,10 +356,8 @@ module Vindicia
     def soap_type_info(type=nil)
       type ||= classname.split('::').last
       ns = Vindicia.sequence_next
-      {
-        "xmlns:n#{ns}"  => "http://soap.vindicia.com/Vindicia",
-        "xsi:type"      => "n#{ns}:#{type}"
-      }
+      { "xsi:type" => "n#{ns}:#{type}",
+        "xmlns:n#{ns}" => "http://soap.vindicia.com/Vindicia" }
     end
 
     def to_hash
