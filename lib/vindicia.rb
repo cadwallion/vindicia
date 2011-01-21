@@ -60,7 +60,7 @@ module Vindicia
     def class(type)
       klass = type.split(':').last
       klass = singularize($1) if klass =~ /^ArrayOf(.*)$/
-      Vindicia.const_get(klass)
+      Vindicia.const_get(klass) rescue nil
     end
 
     def type_of(arg)
@@ -220,8 +220,7 @@ module Vindicia
     attr_accessor :request_status
 
     def attributes
-      key = classname
-      @attributes ||= Vindicia.xsd(key).inject({}) do |memo, attr|
+      @attributes ||= Vindicia.xsd(classname).inject({}) do |memo, attr|
         memo[attr["name"]] = attr["type"]
         memo["vid"] = attr["type"] if attr["name"] == "VID" # oh, casing
         memo
@@ -238,10 +237,13 @@ module Vindicia
 
       arg.each do |key, value|
         if key == :type
-          # pull out namespaced values, leave "real" values for CreditCard (+others?)
+          # XML->Hash conversion causes conflict between 'type' metadata
+          # and 'type' data field in CreditCard (+others?)
+          # so extract the value we want.
           value = [value].flatten.reject{|e|e =~ /:/}.first
           next if value.nil?
         end
+        # skip metadata
         next if [:xmlns, :array_type].include? key
         type = attributes[camelcase(key.to_s)]
         cast_as_soap_object(type, value) do |obj|
