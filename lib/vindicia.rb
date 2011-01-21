@@ -93,7 +93,46 @@ module Vindicia
     end
   end
 
+  module XMLBuilder
+    def build_xml(xml, name, type, value)
+      if value.kind_of? Array
+        build_array_xml(xml, name, type, value)
+      else
+        build_tag_xml(xml, name, type, value)
+      end
+    end
+
+    def build_array_xml(xml, name, type, value)
+      attrs = {
+        "xmlns:enc" => "http://schemas.xmlsoap.org/soap/encoding/",
+        "xsi:type" => "enc:Array",
+        "enc:arrayType" => "vin:#{name}[#{value.size}]"
+      }
+      xml.tag!(name, attrs) do |x|
+        value.each do |val|
+          build_tag_xml(x, 'item', type, val)
+        end
+      end
+    end
+
+    def build_tag_xml(xml, name, type, value)
+      case value
+      when Hash
+        Vindicia.class(type).new(value).build(xml, name)
+      when SoapObject
+        value.build(xml, name)
+      when NilClass
+        xml.tag!(name, value, {"xsi:nil" => true})
+      else
+        type = type.sub(/^tns/,'vin')
+        xml.tag!(name, value, {"xsi:type" => type})
+      end
+    end
+  end
+
   module SoapClient
+    include XMLBuilder
+
     def find(id)
       self.send(:"fetch_by_merchant_#{name.downcase}_id", id)
     end
@@ -103,29 +142,15 @@ module Vindicia
       out_vars = nil # set up outside variable
 
       response = soap.request(:wsdl, method) do |soap, wsdl|
-        soap.namespaces["xmlns:vin"] = Vindicia::NAMESPACE
-
         out_vars = wsdl.arg_list["#{method.to_s.lower_camelcase}_out"]
+
+        soap.namespaces["xmlns:vin"] = Vindicia::NAMESPACE
         soap.body = begin
           xml = Builder::XmlMarkup.new
 
           key = "#{method.to_s.lower_camelcase}_in"
           wsdl.arg_list[key].zip([Vindicia.auth] + args).each do |arg, data|
-            if data.kind_of? Array
-              attrs = {
-                "xmlns:enc" => "http://schemas.xmlsoap.org/soap/encoding/",
-                "xsi:type" => "enc:Array",
-                "enc:arrayType" => "vin:#{name}[#{data.size}]"
-              }
-              xml.tag!(name, attrs) do |x|
-                data.each do |dat|
-                  arg["name"] = "item"
-                  build_object(xml, arg, dat)
-                end
-              end
-            else
-              build_object(xml, arg, data)
-            end
+            build_xml(xml, arg['name'], arg['type'], data)
           end
 
           xml.target!
@@ -166,19 +191,6 @@ module Vindicia
       end
     end
 
-    def build_object(xml, arg, data)
-      case data
-      when Hash
-        Vindicia.class(arg["type"]).new(data).build(xml, arg["name"])
-      when SoapObject
-        data.build(xml, arg["name"])
-      when NilClass
-        xml.tag!(arg["name"], data, {"xsi:nil" => true})
-      else
-        xml.tag!(arg["name"], data, {"xsi:type" => Vindicia.type_of(data)})
-      end
-    end
-
     def name
       self.to_s.split('::').last
     end
@@ -215,6 +227,7 @@ module Vindicia
   end
 
   class SoapObject
+    include XMLBuilder
     include Comparable
     attr_accessor :request_status
 
@@ -260,40 +273,11 @@ module Vindicia
           next if name == 'vid'
 
           value = instance_variable_get("@#{underscore(name)}") || instance_variable_get("@#{name}")
-
-          if value.kind_of? Array
-            build_array(xml, name, value)
-          else
-            build_tag(xml, name, value)
-          end
+          build_xml(xml, name, type, value)
         end
       end
     end
     
-    def build_array(xml, name, value)
-      attrs = {
-        "xmlns:enc" => "http://schemas.xmlsoap.org/soap/encoding/",
-        "xsi:type" => "enc:Array",
-        "enc:arrayType" => "vin:#{name}[#{value.size}]"
-      }
-      xml.tag!(name, attrs) do |x|
-        value.each do |val|
-          build_tag(x, 'item', val)
-        end
-      end
-    end
-
-    def build_tag(xml, name, value)
-      case value
-      when SoapObject
-        value.build(xml, name)
-      when NilClass
-        xml.tag!(name, {"xsi:nil" => true}, value)
-      else
-        xml.tag!(name, {"xsi:type" => Vindicia.type_of(value)}, value)
-      end
-    end
-
     def cast_as_soap_object(type, value)
       return nil if type.nil? or value.nil?
       return value unless type =~ /tns:/
