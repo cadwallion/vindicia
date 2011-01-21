@@ -84,10 +84,37 @@ module Vindicia
       end
     end
 
+    def coerce(name, type, value)
+      return value if value.kind_of? SoapObject
+
+      case type
+      when /ArrayOf/
+        return [] if value.nil?
+        if value.kind_of? Hash
+          if value[name.to_sym]
+            return coerce(name, type, [value[name.to_sym]].flatten)
+          else
+            value = [value]
+          end
+        end
+        value.map do |val|
+          coerce(name, singularize(type), val)
+        end
+      when /^namesp/, /^vin/
+        type = value[:type] if value.kind_of? Hash
+        Vindicia.class(type).new(value)
+      when "xsd:int"
+        value.to_i
+      else
+        value
+      end
+    end
+
   private
     def singularize(type)
       # Specifically formulated for just the ArrayOf types in Vindicia
-      type.sub(/ies$/, 'y').
+      type.sub(/ArrayOf/,'').
+        sub(/ies$/, 'y').
         sub(/([sx])es$/, '\1').
         sub(/s$/, '')
     end
@@ -138,6 +165,8 @@ module Vindicia
     end
 
     def method_missing(method, *args)
+      # TODO: verify that this method _is_ a method callable on the wsdl,
+      #       and defer to super if not.
       method = underscore(method.to_s).to_sym # back compatability from camelCase api
       out_vars = nil # set up outside variable
 
@@ -160,18 +189,7 @@ module Vindicia
       values = response.to_hash[:"#{method}_response"]
       objs = out_vars.map do |var|
         value = values[underscore(var["name"]).to_sym]
-        case var["type"]
-        when /ArrayOf/
-          [value[var["name"].to_sym]].flatten.map do |val|
-            Vindicia.class(value[:type]).new(val)
-          end
-        when /^namesp/, /^vin/
-          Vindicia.class(value[:type]).new(value)
-        when "xsd:int"
-          value.to_i
-        else
-          value
-        end
+        Vindicia.coerce(var["name"], var["type"], value)
       end
 
       ret = objs.shift
@@ -326,28 +344,13 @@ module Vindicia
     end
 
     def method_missing(method, *args)
-      method = underscore(method.to_s).to_sym # back compatability from camelCase api
-      key = camelcase(method.to_s)
+      attr = underscore(method.to_s).to_sym # back compatability from camelCase api
+      key = camelcase(attr.to_s)
 
-      return super unless attributes[key]
-
-      value = instance_variable_get("@#{method}")
-      case attributes[key]
-      when /ArrayOf/
-        (value||[]).map do |val|
-          if val.kind_of? Hash
-            Vindicia.class(val[:type]).new(val)
-          else
-            val
-          end
-        end
-      when /^namesp/, /^vin/
-        value
-        #Vindicia.class(value[:type]).new(value)
-      when "xsd:int"
-        value.to_i
+      if attributes[key]
+        Vindicia.coerce(key, attributes[key], instance_variable_get("@#{attr}"))
       else
-        value
+        super
       end
     end
 
