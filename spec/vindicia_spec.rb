@@ -244,6 +244,8 @@ describe Vindicia do
           :amount                 => 49.00,
           :transactionItems       => [{:sku => 'sku', :name => 'Established Men Subscription', :price => 49.00, :quantity => 1}]
         }, false)
+        transaction.request_status.code.should == 200
+
         pending 'a way to force immediate capturing'
         transaction.statusLog.first['status'].should == 'Captured'
       end

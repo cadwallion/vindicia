@@ -68,6 +68,12 @@ module Vindicia
       @seq += 1
     end
 
+    def class(type)
+      klass = type.split(':').last
+      klass = singularize($1) if klass =~ /^ArrayOf(.*)$/
+      Vindicia.const_get(klass)
+    end
+
     def type_of(arg)
       case arg
         when TrueClass, FalseClass
@@ -82,9 +88,19 @@ module Vindicia
         when Date, DateTime, Time
           'xsd:dateTime'
         #TODO: 'xsd:anyURI'
+        when SoapObject
+          "wsdl:#{arg.classname}"
         else
-          raise "Unknown type for #{arg.class}:#{arg.inspect}"
+          raise "Unknown type for #{arg.class}~#{arg.inspect}"
       end
+    end
+
+  private
+    def singularize(type)
+      # Specifically formulated for just the ArrayOf types in Vindicia
+      type.sub(/ies$/, 'y').
+        sub(/([sx])es$/, '\1').
+        sub(/s$/, '')
     end
   end
 
@@ -99,30 +115,29 @@ module Vindicia
 
       Vindicia.sequence_reset
       Vindicia.sequence_next
-      response = soap.request(:n1, method) do |soap, wsdl|
+      response = soap.request(:wsdl, method) do |soap, wsdl|
+        soap.namespaces["xmlns:vin"] = Vindicia::NAMESPACE
+
         out_vars = wsdl.arg_list["#{method.to_s.lower_camelcase}_out"]
         soap.body = begin
           xml = Builder::XmlMarkup.new
 
           key = "#{method.to_s.lower_camelcase}_in"
           wsdl.arg_list[key].zip([Vindicia.auth] + args).each do |arg, data|
-            case data
-            when Hash
-              begin
-                obj = Vindicia.const_get(arg["type"].split(':').last).new(data)
-                obj.build(xml, arg["name"])
-              rescue
-                data
+            if data.kind_of? Array
+              attrs = {
+                "xmlns:enc" => "http://schemas.xmlsoap.org/soap/encoding/",
+                "xsi:type" => "enc:Array",
+                "enc:arrayType" => "vin:#{name}[#{data.size}]"
+              }
+              xml.tag!(name, attrs) do |x|
+                data.each do |dat|
+                  arg["name"] = "item"
+                  build_object(xml, arg, dat)
+                end
               end
-            when SoapObject
-              data.build(xml, arg["name"])
             else
-              opts = if data.nil?
-                {"xsi:nil" => true}
-              else
-                {"xsi:type" => Vindicia.type_of(data)} #arg["type"]}
-              end
-              xml.tag!(arg["name"], data, opts)
+              build_object(xml, arg, data)
             end
           end
 
@@ -132,8 +147,19 @@ module Vindicia
 
       values = response.to_hash[:"#{method}_response"]
       objs = out_vars.map do |var|
-        value = values[var["name"].to_sym]
-        Vindicia.const_get(value[:type].split(':').last).new(value) rescue value
+        value = values[underscore(var["name"]).to_sym]
+        case var["type"]
+        when /ArrayOf/
+          [value[var["name"].to_sym]].flatten.map do |val|
+            Vindicia.class(value[:type]).new(val)
+          end
+        when /^namesp/, /^vin/
+          Vindicia.class(value[:type]).new(value)
+        when "xsd:int"
+          value.to_i
+        else
+          value
+        end
       end
 
       ret = objs.shift
@@ -153,22 +179,23 @@ module Vindicia
       end
     end
 
+    def build_object(xml, arg, data)
+      case data
+      when Hash
+        obj = Vindicia.class(arg["type"]).new(data)
+        obj.build(xml, arg["name"])
+      when SoapObject
+        data.build(xml, arg["name"])
+      when NilClass
+        xml.tag!(arg["name"], data, {"xsi:nil" => true})
+      else
+        xml.tag!(arg["name"], data, {"xsi:type" => Vindicia.type_of(data)})
+      end
+    end
+
     def name
       self.to_s.split('::').last
     end
-
-    # def r_merge
-    #   @r_merge ||= proc do |key,v1,v2|
-    #     Hash === v1 && Hash === v2 ? v1.merge(v2, &r_merge) : v2
-    #   end
-    # end
-
-    # def required(*fields)
-    #   @required_fields = fields
-    # end
-    # def required_fields
-    #   @required_fields || []
-    # end
 
     def soap
       @soap ||= begin
@@ -206,7 +233,7 @@ module Vindicia
     attr_accessor :request_status
 
     def attributes
-      key = self.class.to_s.split('::').last
+      key = classname
       @attributes ||= Vindicia.xsd(key).inject({}) do |memo, attr|
         memo[attr["name"]] = attr["type"]
         memo["vid"] = attr["type"] if attr["name"] == "VID" # oh, casing
@@ -260,23 +287,42 @@ module Vindicia
             next
           end
 
-          if value.kind_of? Hash
-            puts "hash, not object (#{type}):"
-            xml.tag!(name) do |x|
-              value.each do |k,v|
-                p [k,v]
-                if v
-                  # this xsi:type is optional
-                  x.tag!(k, {"xsi:type" => Vindicia.type_of(v)}, v)
-                else
-                  x.tag!(k, {"xsi:nil" => "true"})
-                end
+          if value.kind_of? Array
+            attrs = {
+              "xmlns:enc" => "http://schemas.xmlsoap.org/soap/encoding/",
+              "xsi:type" => "enc:Array",
+              "enc:arrayType" => "vin:#{name}[#{value.size}]"
+            }
+            xml.tag!(name, attrs) do |x|
+              value.each do |val|
+                write_tag(x, 'item', val)
               end
             end
           else
-            xml.tag!(name, {"xsi:type" => Vindicia.type_of(value)}, value)
+            write_tag(xml, name, value)
           end
         end
+      end
+    end
+
+    def write_tag(xml, name, value)
+      if value.kind_of? SoapObject
+        value.build(xml, name)
+      elsif value.kind_of? Hash
+        puts "hash, not object (#{type}):"
+        xml.tag!(name) do |x|
+          value.each do |k,v|
+            p [k,v]
+            if v
+              # this xsi:type is optional
+              x.tag!(k, {"xsi:type" => Vindicia.type_of(v)}, v)
+            else
+              x.tag!(k, {"xsi:nil" => "true"})
+            end
+          end
+        end
+      else
+        xml.tag!(name, {"xsi:type" => Vindicia.type_of(value)}, value)
       end
     end
 
@@ -309,7 +355,7 @@ module Vindicia
     end
 
     def classname
-      self.class.name
+      self.class.to_s.split('::').last
     end
 
     def each
@@ -323,25 +369,34 @@ module Vindicia
       attributes.key?(k.to_s)
     end
 
+    def type(*args)
+      # type is deprecated, override so that it does a regular attribute lookup
+      method_missing(:type, *args)
+    end
+
     def method_missing(method, *args)
       method = underscore(method.to_s).to_sym # back compatability from camelCase api
       key = camelcase(method.to_s)
 
-      if attributes[key]
-        val = instance_variable_get("@#{method}")
-        if val.kind_of?(Hash) && val.key?(:array_type)
-          val = [val[method]].flatten.map do |e|
-            cls = e[:type].last.split(':').last
-            if Vindicia.const_defined?(cls)
-              Vindicia.const_get(cls).new(e)
-            else
-              e
-            end
+      return super unless attributes[key]
+
+      value = instance_variable_get("@#{method}")
+      case attributes[key]
+      when /ArrayOf/
+        (value||[]).map do |val|
+          if val.kind_of? Hash
+            Vindicia.class(val[:type]).new(val)
+          else
+            val
           end
         end
-        val
+      when /^namesp/, /^vin/
+        value
+        #Vindicia.class(value[:type]).new(value)
+      when "xsd:int"
+        value.to_i
       else
-        super
+        value
       end
     end
 
@@ -354,7 +409,7 @@ module Vindicia
     end
 
     def soap_type_info(type=nil)
-      type ||= classname.split('::').last
+      type ||= classname
       ns = Vindicia.sequence_next
       { "xsi:type" => "n#{ns}:#{type}",
         "xmlns:n#{ns}" => "http://soap.vindicia.com/Vindicia" }
@@ -392,9 +447,9 @@ module Vindicia
 
     def singularize(type)
       # Specifically formulated for just the ArrayOf types in Vindicia
-      type.sub(/ies$/, 'y')
-      type.sub(/([sx])es$/, '\1')
-      type.sub(/s$/, '')
+      type.sub(/ies$/, 'y').
+        sub(/([sx])es$/, '\1').
+        sub(/s$/, '')
     end
   end
 
