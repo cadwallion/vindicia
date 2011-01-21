@@ -254,7 +254,7 @@ module Vindicia
     end
 
     def build(xml, tag)
-      xml.tag!(tag, soap_type_info) do |xml|
+      xml.tag!(tag, {"xsi:type" => "vin:#{classname}"}) do |xml|
         attributes.each do |name, type|
           next if name == 'vid'
 
@@ -393,11 +393,6 @@ module Vindicia
       key = instance_variable_get("@merchant#{classname}Id")
       ukey = instance_variable_get("@merchant_#{underscore(classname)}_id")
       {"merchant#{classname}Id" => ukey || key}
-    end
-
-    def soap_type_info(type=nil)
-      type ||= classname
-      { "xsi:type" => "vin:#{type}" }
     end
 
     def to_hash
