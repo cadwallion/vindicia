@@ -169,8 +169,7 @@ module Vindicia
     def build_object(xml, arg, data)
       case data
       when Hash
-        obj = Vindicia.class(arg["type"]).new(data)
-        obj.build(xml, arg["name"])
+        Vindicia.class(arg["type"]).new(data).build(xml, arg["name"])
       when SoapObject
         data.build(xml, arg["name"])
       when NilClass
@@ -262,54 +261,34 @@ module Vindicia
 
           value = instance_variable_get("@#{underscore(name)}") || instance_variable_get("@#{name}")
 
-          if value.nil?
-            #next if attribute["minOccurs"] == '0'
-            attr = {"xsi:nil" => true} if value.nil?
-            xml.tag!(name, attr, value)
-            next
-          end
-
-          class_name = type.split(':').last
-          if type =~ /tns:/ and Vindicia.const_defined?(class_name)
-            klass = Vindicia.const_get(class_name)
-            klass.new(value).build(xml, name)
-            next
-          end
-
           if value.kind_of? Array
-            attrs = {
-              "xmlns:enc" => "http://schemas.xmlsoap.org/soap/encoding/",
-              "xsi:type" => "enc:Array",
-              "enc:arrayType" => "vin:#{name}[#{value.size}]"
-            }
-            xml.tag!(name, attrs) do |x|
-              value.each do |val|
-                write_tag(x, 'item', val)
-              end
-            end
+            build_array(xml, name, value)
           else
-            write_tag(xml, name, value)
+            build_tag(xml, name, value)
           end
         end
       end
     end
-
-    def write_tag(xml, name, value)
-      if value.kind_of? SoapObject
-        value.build(xml, name)
-      elsif value.kind_of? Hash
-        puts "hash, not object (#{type}):"
-        xml.tag!(name) do |x|
-          value.each do |k,v|
-            p [k,v]
-            if v
-              # this xsi:type is optional
-              x.tag!(k, {"xsi:type" => Vindicia.type_of(v)}, v)
-            else
-              x.tag!(k, {"xsi:nil" => "true"})
-            end
-          end
+    
+    def build_array(xml, name, value)
+      attrs = {
+        "xmlns:enc" => "http://schemas.xmlsoap.org/soap/encoding/",
+        "xsi:type" => "enc:Array",
+        "enc:arrayType" => "vin:#{name}[#{value.size}]"
+      }
+      xml.tag!(name, attrs) do |x|
+        value.each do |val|
+          build_tag(x, 'item', val)
         end
+      end
+    end
+
+    def build_tag(xml, name, value)
+      case value
+      when SoapObject
+        value.build(xml, name)
+      when NilClass
+        xml.tag!(name, {"xsi:nil" => true}, value)
       else
         xml.tag!(name, {"xsi:type" => Vindicia.type_of(value)}, value)
       end
@@ -333,9 +312,8 @@ module Vindicia
         return ary
       end
 
-      class_name = type.split(':').last
-      if Vindicia.const_defined?(class_name)
-        obj = Vindicia.const_get(class_name).new(value)
+      if klass = Vindicia.class(type)
+        obj = klass.new(value)
         yield obj if block_given?
         return obj
       else
