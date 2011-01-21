@@ -1,6 +1,5 @@
 require 'savon'
 require 'savon_patches'
-require 'httpclient'
 
 Savon.configure do |config|
   config.log = false            # disable logging
