@@ -57,17 +57,6 @@ module Vindicia
       "http://#{domain}/#{version}/#{object}.wsdl"
     end
 
-    def sequence
-      @seq ||= 0
-    end
-    def sequence_reset
-      @seq = 0
-    end
-    def sequence_next
-      @seq ||= 0
-      @seq += 1
-    end
-
     def class(type)
       klass = type.split(':').last
       klass = singularize($1) if klass =~ /^ArrayOf(.*)$/
@@ -113,8 +102,6 @@ module Vindicia
       method = underscore(method.to_s).to_sym # back compatability from camelCase api
       out_vars = nil # set up outside variable
 
-      Vindicia.sequence_reset
-      Vindicia.sequence_next
       response = soap.request(:wsdl, method) do |soap, wsdl|
         soap.namespaces["xmlns:vin"] = Vindicia::NAMESPACE
 
@@ -410,9 +397,7 @@ module Vindicia
 
     def soap_type_info(type=nil)
       type ||= classname
-      ns = Vindicia.sequence_next
-      { "xsi:type" => "n#{ns}:#{type}",
-        "xmlns:n#{ns}" => "http://soap.vindicia.com/Vindicia" }
+      { "xsi:type" => "vin:#{type}" }
     end
 
     def to_hash
