@@ -13,6 +13,7 @@ begin
     gemspec.email = "jamie@almlabs.com"
     gemspec.homepage = "http://github.com/almlabs/vindicia"
     gemspec.authors = ["Jamie Macey"]
+    gemspec.add_dependency('savon', '=0.8.2')
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: gem install jeweler"
