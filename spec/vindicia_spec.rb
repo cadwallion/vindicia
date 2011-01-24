@@ -171,8 +171,21 @@ describe Vindicia do
     }, true, 'Validate', nil)
   end
   
-  it 'should map payment method to a Vindicia:: class' do
+  it 'should map associated objects to a Vindicia:: class' do
     @account.paymentMethods.first.class.should == Vindicia::PaymentMethod
+  end
+
+  it 'should map associated arrays to a Vindicia:: class' do
+    transaction = Vindicia::Transaction.auth({
+      :account                => @account.ref,
+      :merchantTransactionId  => "Purchase.id (#{Time.now.to_i})",
+      :sourcePaymentMethod    => {:VID => @account.paymentMethods.first.VID},
+      :amount                 => 49.00,
+      :transactionItems       => [{:sku => 'sku', :name => 'Established Men Subscription', :price => 49.00, :quantity => 1}]
+    }, 100, false)
+    transaction.request_status.code.should == 200
+
+    transaction.statusLog.first.should be_kind_of(Vindicia::TransactionStatus)
   end
 
   describe Vindicia::AutoBill do
@@ -230,7 +243,7 @@ describe Vindicia do
         
         pending 'a way to force immediate capturing'
         transaction = Vindicia::Transaction.find(@transaction.merchantTransactionId)
-        transaction.statusLog.first['status'].should == 'Captured'
+        transaction.statusLog.status.should == 'Captured'
       end
     end
 
@@ -247,7 +260,7 @@ describe Vindicia do
         transaction.request_status.code.should == 200
 
         pending 'a way to force immediate capturing'
-        transaction.statusLog.first['status'].should == 'Captured'
+        transaction.statusLog.status.should == 'Captured'
       end
     end
   end

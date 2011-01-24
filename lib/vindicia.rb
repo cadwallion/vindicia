@@ -99,9 +99,13 @@ module Vindicia
         value.map do |val|
           coerce(name, singularize(type), val)
         end
-      when /^namesp/, /^vin/
+      when /^namesp/, /^vin/, /^tns/
         type = value[:type] if value.kind_of? Hash
-        Vindicia.class(type).new(value)
+        if klass = Vindicia.class(type)
+          klass.new(value)
+        else
+          value
+        end
       when "xsd:int"
         value.to_i
       else
