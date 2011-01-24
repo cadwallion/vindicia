@@ -112,10 +112,12 @@ module Vindicia
   private
     def singularize(type)
       # Specifically formulated for just the ArrayOf types in Vindicia
+      # The '!' is there to handle singularizing "ses" suffix correctly
       type.sub(/ArrayOf/,'').
         sub(/ies$/, 'y').
-        sub(/([sx])es$/, '\1').
-        sub(/s$/, '')
+        sub(/([sx])es$/, '\1!').
+        sub(/s$/, '').
+        chomp('!')
     end
   end
 
