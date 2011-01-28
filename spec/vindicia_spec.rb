@@ -1,6 +1,12 @@
 require 'vindicia'
 require 'authenticate'
 
+Savon.configure do |config|
+  config.log = false            # disable logging
+  #config.log_level = :info      # changing the log level
+  #config.logger = Rails.logger  # using the Rails logger
+end
+
 describe Vindicia::Account do
   it 'should return a singleton soap wrapper' do
     a = Vindicia::Account
