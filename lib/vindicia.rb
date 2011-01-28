@@ -103,6 +103,12 @@ module Vindicia
         else
           value
         end
+      when "xsd:string"
+        if value == {:type=>"xsd:string", :xmlns=>""}
+          nil
+        else
+          value
+        end
       when "xsd:int"
         value.to_i
       else

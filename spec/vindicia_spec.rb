@@ -181,6 +181,10 @@ describe Vindicia do
     @account.paymentMethods.first.class.should == Vindicia::PaymentMethod
   end
 
+  it 'should map nil objects to nil' do
+    @account.preferred_language.should be_nil
+  end
+
   it 'should map associated arrays to a Vindicia:: class' do
     transaction = Vindicia::Transaction.auth({
       :account                => @account.ref,
