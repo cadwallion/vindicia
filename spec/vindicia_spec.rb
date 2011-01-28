@@ -91,6 +91,14 @@ describe Vindicia::SoapObject do
     product.default_billing_plan.should be_kind_of(Vindicia::BillingPlan)
   end
 
+  it 'should allow hash access' do
+    product = Vindicia::Product.new(
+      :default_billing_plan => {:status => "Active"}
+    )
+    product['defaultBillingPlan'].should_not be_nil
+    product['defaultBillingPlan'].should == product.default_billing_plan
+  end
+
   it 'should deserialze arrays' do
     plan = Vindicia::BillingPlan.new(
       :periods => [{
@@ -245,6 +253,12 @@ describe Vindicia do
         }, 100, false)
       end
       
+      it 'should look up authorization' do
+        @transaction['merchantTransactionId'].should =~ /^Purchase.id /
+        @transaction.merchantTransactionId.should    =~ /^Purchase.id /
+        @transaction.merchant_transaction_id.should  =~ /^Purchase.id /
+      end
+
       it 'should capture an authorized purchase' do
         ret, success, fail, results = Vindicia::Transaction.capture([@transaction.ref])
         success.should == 1

@@ -293,6 +293,11 @@ module Vindicia
       end
     end
 
+    def [](attr)
+      key = camelcase(attr.to_s)
+      Vindicia.coerce(key, attributes[key], instance_variable_get("@#{underscore(attr)}"))
+    end
+
     def build(xml, tag)
       xml.tag!(tag, {"xsi:type" => "vin:#{classname}"}) do |xml|
         attributes.each do |name, type|
@@ -356,7 +361,7 @@ module Vindicia
       key = camelcase(attr.to_s)
 
       if attributes[key]
-        Vindicia.coerce(key, attributes[key], instance_variable_get("@#{attr}"))
+        self[key]
       else
         super
       end
