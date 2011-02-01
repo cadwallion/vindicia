@@ -87,6 +87,7 @@ module Vindicia
       when /ArrayOf/
         return [] if value.nil?
         if value.kind_of? Hash
+          return [] if value[:array_type] =~ /\[0\]$/
           if value[name.to_sym]
             return coerce(name, type, [value[name.to_sym]].flatten)
           else

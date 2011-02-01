@@ -2,7 +2,7 @@ require 'vindicia'
 require 'authenticate'
 
 Savon.configure do |config|
-  config.log = false            # disable logging
+  config.log = false             # disable logging
   #config.log_level = :info      # changing the log level
   #config.logger = Rails.logger  # using the Rails logger
 end
@@ -143,6 +143,13 @@ describe Vindicia::SoapObject do
     plan.periods.should be_kind_of(Array)
     plan.periods.size.should == 1
     plan.periods.first.should be_kind_of(Vindicia::BillingPlanPeriod)
+  end
+
+  it 'should deserialize empty arrays from soap' do
+    ret, transactions = Vindicia::Transaction.fetchDeltaSince(Date.new(2011,2,1), Date.new(2011,2,2), 500, 10, nil)
+
+    ret.should be_kind_of(Vindicia::Return)
+    transactions.should == []
   end
 end
 
