@@ -179,7 +179,10 @@ module Vindicia
       method = underscore(method.to_s).to_sym # back compatability from camelCase api
       out_vars = nil # set up outside variable
 
-      response = soap.request(:wsdl, method) do |soap, wsdl|
+      response = soap.request(:wsdl, method) do |soap, wsdl, http|
+        # Don't care about broken SSL when testing
+        http.auth.ssl.verify_mode = :none if Vindicia.environment == 'prodtest'
+
         out_vars = wsdl.arg_list["#{method.to_s.lower_camelcase}_out"]
 
         soap.namespaces["xmlns:vin"] = Vindicia::NAMESPACE
