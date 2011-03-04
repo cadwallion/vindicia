@@ -226,6 +226,13 @@ describe Vindicia do
     
       autobill.request_status.code.should == 200
     end
+
+    it 'should find date-boxed autobill updates' do
+      date = Date.new(2011,1,1)
+      ret, autobills = Vindicia::AutoBill.fetchDeltaSince(date, 1, 5, date+1)
+      ret.code.should == 200
+      autobills.size.should == 5
+    end
   end
 
   describe Vindicia::Transaction do

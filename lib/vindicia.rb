@@ -161,6 +161,8 @@ module Vindicia
         xml.tag!(name, value, {"xsi:nil" => true})
       else
         type = type.sub(/^tns/,'vin')
+        # format dates/times with full timestamp
+        value = value.strftime('%Y-%m-%dT%H:%M:%S%z') if value.respond_to?(:strftime) && type == 'xsd:dateTime'
         xml.tag!(name, value, {"xsi:type" => type})
       end
     end
