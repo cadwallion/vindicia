@@ -246,6 +246,23 @@ describe Vindicia do
         }, 100, false)
         transaction.request_status.code.should == 200
       end
+
+      it 'should auth a purchase with payment method ID' do
+        payment_id = @account.paymentMethods.first.merchant_payment_method_id
+        transaction = Vindicia::Transaction.auth({
+          :account                => @account.ref,
+          :merchantTransactionId  => "Purchase.id (#{Time.now.to_i})",
+          :sourcePaymentMethod    => {:merchant_payment_method_id => payment_id},
+          :amount                 => 49.00,
+          :transactionItems       => [{:sku => 'sku', :name => 'Established Men Subscription', :price => 49.00, :quantity => 1}]
+          #:divisionNumber                xsd:string
+          #:userAgent                     xsd:string
+          #:sourceMacAddress              xsd:string
+          #:sourceIp                      xsd:string
+          #:billingStatementIdentifier    xsd:string
+        }, 100, false)
+        transaction.request_status.code.should == 200
+      end
     end
 
     describe '#capture' do
