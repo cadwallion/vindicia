@@ -1,6 +1,7 @@
 require 'vindicia'
 require 'authenticate'
 
+def HTTPI.log(*args); end
 Savon.configure do |config|
   config.log = false             # disable logging
   #config.log_level = :info      # changing the log level
