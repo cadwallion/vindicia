@@ -2,7 +2,7 @@ This library is an API wrapper for the [Vindicia][] payment gateway.
 
 # Dependencies
 
-As of the 0.2.0 release, this gem targets Ruby 1.9.
+As of the 0.2.0 release, this gem targets both Ruby 1.8 and 1.9.
 
 It requires the [savon][] SOAP client library, and will use [httpclient][] if present (otherwise just using net/http).
 
@@ -31,7 +31,7 @@ To run the specs, you'll need to copy `authenticate.example.rb` to `authenticate
 
 # Known Issues
 
-HTTPI (a savon dependency) is _really_ chatty logging to stdout, and I haven't figured out a good way to mute it.
+Savon and HTTPI are noisy logging to stdout by default, see the top of vindicia_spec.rb for some sample code to quiet them.
 
 WSDL files are being live-downloaded every run. It'd be nice to cache them locally.
 
