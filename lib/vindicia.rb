@@ -1,5 +1,6 @@
 require 'savon'
 require 'savon_patches'
+require 'time'
 
 Savon.configure do |config|
   config.soap_version = 1
@@ -162,7 +163,7 @@ module Vindicia
       else
         type = type.sub(/^tns/,'vin')
         # format dates/times with full timestamp
-        value = value.strftime('%Y-%m-%dT%H:%M:%S%z') if value.respond_to?(:strftime) && type == 'xsd:dateTime'
+        value = value.to_time.iso8601 if value.respond_to?(:to_time) && type == 'xsd:dateTime'
         xml.tag!(name, value, {"xsi:type" => type})
       end
     end
