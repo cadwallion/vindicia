@@ -173,7 +173,7 @@ module Vindicia
     include XMLBuilder
 
     def find(id)
-      self.send(:"fetch_by_merchant_#{name.downcase}_id", id)
+      self.send(:"fetch_by_merchant_#{underscore(name)}_id", id)
     end
 
     def method_missing(method, *args)
