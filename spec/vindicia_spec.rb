@@ -228,6 +228,28 @@ describe Vindicia do
       autobill.request_status.code.should == 200
     end
 
+    it 'can adjust next billing date backwards' do
+      @product = Vindicia::Product.new('em-2-PREMIUM-USD')
+      @billing = Vindicia::BillingPlan.new('em-2-PREMIUM-USD')
+      @id = "autobill-#{Time.now.to_i}"
+      autobill, created, authstatus, firstBillDate, firstBillAmount, firstBillingCurrency = \
+      Vindicia::AutoBill.update({
+        :account => @account.ref,
+        :product => @product.ref,
+        :billingPlan => @billing.ref,
+        :merchant_auto_bill_id => @id
+      }, 'Fail', true, 100)
+
+      ab = Vindicia::AutoBill.find(@id)
+      original_date = ab.future_rebills.first.timestamp
+      Vindicia::AutoBill.delay_billing_to_date(Vindicia::AutoBill.new(@id), original_date - 2)
+
+      ab2 = Vindicia::AutoBill.find(@id)
+      new_date = ab2.future_rebills.first.timestamp
+
+      new_date.should == original_date - 2
+    end
+
     it 'should find date-boxed autobill updates' do
       date = Date.new(2011,1,1)
       ret, autobills = Vindicia::AutoBill.fetchDeltaSince(date, 1, 5, date+1)
