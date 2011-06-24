@@ -54,6 +54,13 @@ module Vindicia
       "http://#{domain}/#{version}/#{object}.wsdl"
     end
 
+    def silence_debug_output!
+      Savon.configure do |config|
+        config.log = false
+      end
+      def HTTPI.log(*args); end
+    end
+
     def class(type)
       klass = type.split(':').last
       klass = singularize($1) if klass =~ /^ArrayOf(.*)$/
@@ -385,6 +392,7 @@ module Vindicia
     def to_hash
       instance_variables.inject({}) do |result, ivar|
         name = ivar[1..-1]
+        next result if name == 'attributes'
         value = instance_variable_get(ivar)
         case value
         when SoapObject
