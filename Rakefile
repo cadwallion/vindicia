@@ -1,6 +1,3 @@
-require 'isolate/now'
-require 'isolate/rake'
-
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec)
 
