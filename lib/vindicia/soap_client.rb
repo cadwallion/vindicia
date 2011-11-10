@@ -9,9 +9,6 @@ module Vindicia
     end
 
     def method_missing(method, *args)
-      # TODO: verify that this method _is_ a method callable on the wsdl,
-      #       and defer to super if not.
-      method = underscore(method.to_s).to_sym # back compatability from camelCase api
       if soap.wsdl.soap_actions.include? method
         define_method(method) {
           response = soap.request(:wsdl, method) do |soap, wsdl, http|
