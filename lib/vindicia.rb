@@ -34,6 +34,10 @@ module Vindicia
       @namespace || 'http://soap.vindicia.com/Vindicia'
     end
 
+    def endpoint=(endpoint)
+      warn "Vindicia.endpoint= has been replaced with environment-based config. Use Vindicia.environment= instead."
+    end
+
     # Add configuration block
     # &block - returns self for configuration.  Alternative to just auth 
     def configure
