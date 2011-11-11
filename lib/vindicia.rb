@@ -17,7 +17,7 @@ module Vindicia
 
     include Bootstrap
     attr_accessor :login, :password, :environment
-    attr_accessor :version, :namespace
+    attr_accessor :version, :namespace, :objectify
     alias :api_version= :version=
 
     def authenticate(login, pass, env=:prodtest)
@@ -27,7 +27,7 @@ module Vindicia
     end
 
     def version
-      @version || '3.6'
+      @version ||= '3.6'
     end
 
     def namespace
@@ -43,6 +43,10 @@ module Vindicia
     def configure
       yield self if block_given?
       bootstrap
+    end
+
+    def objectify
+      @objectify ||= false
     end
 
     def auth

@@ -4,6 +4,25 @@ require 'vindicia'
 
 module Vindicia
   module Bootstrap
+    module ClassMethods
+      def client                
+        @client ||= Savon::Client.new do |wsdl|
+          wsdl.endpoint = Vindicia.endpoint
+        end  
+      end
+
+      def soap_call(method, args, endpoint = Vindicia.endpoint)
+        return self.client.request(:wsdl, method) do
+          http.auth.ssl.verify_mode = :none if Vindicia.environment == 'prodtest'
+          wsdl.endpoint = endpoint
+
+          soap.namespaces["xmlns:vin"] = Vindicia.namespace
+          soap.namespaces["xmlns:tns"] = Vindicia.namespace
+          soap.body = { :auth => Vindicia.auth }.merge(args)
+        end
+      end
+    end
+
     # Pulls a .XSD that maps every SOAP API in the system, and delegates to 
     # bootstrap each class
     def bootstrap
@@ -35,23 +54,7 @@ module Vindicia
     def bootstrap_class(class_name)
       if valid_soap_api? Vindicia.wsdl(class_name)
         klass = const_set(class_name.to_sym, Class.new do
-          def self.client                
-            @client ||= Savon::Client.new do |wsdl|
-              wsdl.endpoint = Vindicia.endpoint
-            end  
-          end
-
-          def self.soap_call(method, args, endpoint = Vindicia.endpoint)
-            return self.client.request(:wsdl, method) do
-              http.auth.ssl.verify_mode = :none if Vindicia.environment == 'prodtest'
-              wsdl.endpoint = endpoint
-
-              soap.namespaces["xmlns:vin"] = Vindicia.namespace
-              soap.namespaces["xmlns:tns"] = Vindicia.namespace
-              soap.body = { :auth => Vindicia.auth }.merge(args)
-            end
-          end
-
+          extend Vindicia::Bootstrap::ClassMethods
         end)
 
         klass.client.wsdl.document = Vindicia.wsdl(class_name)
