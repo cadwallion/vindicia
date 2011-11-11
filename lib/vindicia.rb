@@ -1,13 +1,13 @@
 require 'savon'
-require 'savon_patches'
 require 'nokogiri'
 
 require 'vindicia/bootstrap'
+require 'vindicia/parser'
 
 
 Savon.configure do |config|
   config.soap_version = 1
-  # doing this to facilitate
+  # doing this to facilitate fallback
   config.raise_errors = false
 end
 
@@ -18,6 +18,7 @@ module Vindicia
     include Bootstrap
     attr_accessor :login, :password, :environment
     attr_accessor :version, :namespace
+    alias :api_version= :version=
 
     def authenticate(login, pass, env=:prodtest)
       @login       = login
@@ -28,7 +29,6 @@ module Vindicia
     def version
       @version || '3.6'
     end
-    alias :api_version= :version=
 
     def namespace
       @namespace || 'http://soap.vindicia.com/Vindicia'
@@ -67,6 +67,11 @@ module Vindicia
         config.log = false
       end
       def HTTPI.log(*args); end
+    end
+
+    def parse_response(soap_response, method_called)
+      parser = Vindicia::Parser.new(soap_response, method_called)
+      parser.parse
     end
 
   private

@@ -39,6 +39,16 @@ module Vindicia
           def self.client                
             @client ||= Savon::Client.new do |wsdl|
               wsdl.endpoint = Vindicia.endpoint
+
+              # Be sure to parse arg lists for revification w/ custom parser
+              def wsdl.parser
+                @parser ||= begin
+                  puts "FUCK"
+                  parser = Savon::WSDL::ParserWithArgList.new
+                  REXML::Document.parse_stream self.document, parser
+                  parser
+                end
+              end
             end  
           end
 
@@ -85,7 +95,7 @@ module Vindicia
               # @TODO: Log the failure and that we're moving to fallback
               next
             else
-              return response
+              return Vindicia.parse_response(response, method)
             end
           end
           raise Savon::HTTP::Error, 'All endpoints appear offline'
