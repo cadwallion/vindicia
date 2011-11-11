@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   
   s.add_dependency('savon', '=0.8.2')
+  s.add_dependency('nokogiri')
   s.add_development_dependency('rspec')
   s.add_development_dependency('jeweler') 
 end
