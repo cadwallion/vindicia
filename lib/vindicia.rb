@@ -66,27 +66,9 @@ module Vindicia
       "http://#{domain}/#{version}/#{object}.wsdl"
     end
 
-    def silence_debug_output!
-      Savon.configure do |config|
-        config.log = false
-      end
-      def HTTPI.log(*args); end
-    end
-
     def parse_response(soap_response, method_called)
       parser = Vindicia::Parser.new(soap_response, method_called)
       parser.parse
-    end
-
-  private
-    def singularize(type)
-      # Specifically formulated for just the ArrayOf types in Vindicia
-      # The '!' is there to handle singularizing "ses" suffix correctly
-      type.sub(/ArrayOf/,'').
-        sub(/ies$/, 'y').
-        sub(/([sx])es$/, '\1!').
-        sub(/s$/, '').
-        chomp('!')
     end
   end
 end

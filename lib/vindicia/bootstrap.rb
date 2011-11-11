@@ -34,21 +34,10 @@ module Vindicia
     # @return Class - class defined
     def bootstrap_class(class_name)
       if valid_soap_api? Vindicia.wsdl(class_name)
-        puts "Bootstrapping class #{class_name}"
         klass = const_set(class_name.to_sym, Class.new do
           def self.client                
             @client ||= Savon::Client.new do |wsdl|
               wsdl.endpoint = Vindicia.endpoint
-
-              # Be sure to parse arg lists for revification w/ custom parser
-              def wsdl.parser
-                @parser ||= begin
-                  puts "FUCK"
-                  parser = Savon::WSDL::ParserWithArgList.new
-                  REXML::Document.parse_stream self.document, parser
-                  parser
-                end
-              end
             end  
           end
 
@@ -79,7 +68,6 @@ module Vindicia
     # @param [Symbol] - method name to be bootstrapped
     # @return [Proc] - proc containing method definition to be eval'd
     def bootstrap_method method
-      puts "Bootstrapping method #{method}"
       return proc do
         (class << self; self ; end).send :define_method, method do |*args|
           endpoints = [Vindicia.endpoint]
