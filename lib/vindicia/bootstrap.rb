@@ -69,7 +69,6 @@ module Vindicia
     def determine_wsdl class_name
       local_path = File.dirname(__FILE__)+"/api-cache/#{Vindicia.version}/#{class_name}.wsdl"
       if File.exists? local_path
-        puts "cache hit"
         return local_path
       else
         Vindicia.wsdl(class_name)
