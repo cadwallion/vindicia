@@ -1,0 +1,141 @@
+<definitions name="Token" targetNamespace="http://soap.vindicia.com/v3_6/Token" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.vindicia.com/v3_6/Token" xmlns:vin="http://soap.vindicia.com/v3_6/Vindicia" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsdl="http://soap.vindicia.com/v3_6/Token" >
+  <documentation>WSDL Specification for Token</documentation>
+  <types>
+    <xsd:schema targetNamespace="http://soap.vindicia.com/v3_6/Token">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:import namespace="http://soap.vindicia.com/v3_6/Vindicia" schemaLocation="./Vindicia.xsd" />
+      <xsd:element name="update">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="token" type="vin:Token" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="updateResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="token" type="vin:Token" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetch">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="token" type="vin:Token" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="token" type="vin:Token" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="update_in">
+    <part element="tns:update" name="parameters" />
+  </message>
+  <message name="update_out">
+    <part element="tns:updateResponse" name="parameters" />
+  </message>
+  <message name="fetch_in">
+    <part element="tns:fetch" name="parameters" />
+  </message>
+  <message name="fetch_out">
+    <part element="tns:fetchResponse" name="parameters" />
+  </message>
+  <portType name="TokenPortType">
+    <operation name="update">
+      <input message="tns:update_in" />
+      <output message="tns:update_out" />
+    </operation>
+    <operation name="fetch">
+      <input message="tns:fetch_in" />
+      <output message="tns:fetch_out" />
+    </operation>
+  </portType>
+  <binding name="TokenBinding" type="tns:TokenPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="update">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+
+      
+Updates/creates the specific <a href="#data_type.Token">Token</a> object.
+<p>
+Has the following return values:<p>
+'400:Identifier not specified' if neither VID nor merchantTokenId was specified<br>
+'404:Unable to load token' The specified VID or merchantTokenId was
+not found<br>
+      
+    <p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>token</b></dt>
+<dd><a href="#data_type.Token">Token</a> object to update</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>token</b></dt>
+<dd>The token object with VID</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Token#update" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetch">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+
+      
+Loads a previously created <a href="#data_type.Token">Token</a> object.The object to load is specified by setting VID or merchantTokenId in the input object
+<p>
+Has the following return values:<p>
+'400:Identifier not specified' if neither VID nor merchantTokenId was specified<br>
+'404:Unable to load token' The specified VID or merchantTokenId was
+not found<br>
+      
+    <p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>token</b></dt>
+<dd><a href="#data_type.Token">Token</a> object to fetch</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>token</b></dt>
+<dd>The token object with this VID</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Token#fetch" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="Token">
+    <port binding="tns:TokenBinding" name="TokenPort">
+      <soap:address location="https://soap.vindicia.com/soap.pl" />
+    </port>
+  </service>
+</definitions>

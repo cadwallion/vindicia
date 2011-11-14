@@ -1,0 +1,138 @@
+<definitions name="ElectronicSignature" targetNamespace="http://soap.vindicia.com/v3_6/ElectronicSignature" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.vindicia.com/v3_6/ElectronicSignature" xmlns:vin="http://soap.vindicia.com/v3_6/Vindicia" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsdl="http://soap.vindicia.com/v3_6/ElectronicSignature" >
+  <documentation>WSDL Specification for ElectronicSignature</documentation>
+  <types>
+    <xsd:schema targetNamespace="http://soap.vindicia.com/v3_6/ElectronicSignature">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:import namespace="http://soap.vindicia.com/v3_6/Vindicia" schemaLocation="./Vindicia.xsd" />
+      <xsd:element name="sign">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="signature" type="vin:ElectronicSignature" />
+            <xsd:element name="formData" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="signResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element name="signatureBlock" type="xsd:string" />
+            <xsd:element name="signatureOk" type="xsd:boolean" />
+            <xsd:element minOccurs="0" name="signature" type="vin:ElectronicSignature" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="getSignatureBlock">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="vindiciaUriBase" type="xsd:string" />
+            <xsd:element name="formTarget" type="xsd:string" />
+            <xsd:element minOccurs="0" name="noscript" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="getSignatureBlockResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element name="signatureBlock" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="sign_in">
+    <part element="tns:sign" name="parameters" />
+  </message>
+  <message name="sign_out">
+    <part element="tns:signResponse" name="parameters" />
+  </message>
+  <message name="getSignatureBlock_in">
+    <part element="tns:getSignatureBlock" name="parameters" />
+  </message>
+  <message name="getSignatureBlock_out">
+    <part element="tns:getSignatureBlockResponse" name="parameters" />
+  </message>
+  <portType name="ElectronicSignaturePortType">
+    <operation name="sign">
+      <input message="tns:sign_in" />
+      <output message="tns:sign_out" />
+    </operation>
+    <operation name="getSignatureBlock">
+      <input message="tns:getSignatureBlock_in" />
+      <output message="tns:getSignatureBlock_out" />
+    </operation>
+  </portType>
+  <binding name="ElectronicSignatureBinding" type="tns:ElectronicSignaturePortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="sign">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>signature</b></dt>
+<dd>Signature object describing this sign event</dd>
+<dt><b>formData</b></dt>
+<dd>Form data submitted by the user when signature is requested.</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>signatureBlock</b></dt>
+<dd>Data to be presented to the user to affect the signature</dd>
+<dt><b>signatureOk</b></dt>
+<dd>Flag for whether the signature was acceptable or not</dd>
+<dt><b>signature</b></dt>
+<dd>Signature object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/ElectronicSignature#sign" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="getSignatureBlock">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Returns a signature block<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>vindiciaUriBase</b></dt>
+<dd>The URI to be signed</dd>
+<dt><b>formTarget</b></dt>
+<dd>Target the form should be submitted to</dd>
+<dt><b>noscript</b></dt>
+<dd>Noscript value</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>signatureBlock</b></dt>
+<dd>The HTML signature block for inclusion in a web page</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/ElectronicSignature#getSignatureBlock" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="ElectronicSignature">
+    <port binding="tns:ElectronicSignatureBinding" name="ElectronicSignaturePort">
+      <soap:address location="https://soap.vindicia.com/soap.pl" />
+    </port>
+  </service>
+</definitions>

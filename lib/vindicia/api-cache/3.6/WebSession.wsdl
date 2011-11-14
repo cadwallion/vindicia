@@ -1,0 +1,142 @@
+<definitions name="WebSession" targetNamespace="http://soap.vindicia.com/v3_6/WebSession" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.vindicia.com/v3_6/WebSession" xmlns:vin="http://soap.vindicia.com/v3_6/Vindicia" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsdl="http://soap.vindicia.com/v3_6/WebSession" >
+  <documentation>WSDL Specification for WebSession</documentation>
+  <types>
+    <xsd:schema targetNamespace="http://soap.vindicia.com/v3_6/WebSession">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:import namespace="http://soap.vindicia.com/v3_6/Vindicia" schemaLocation="./Vindicia.xsd" />
+      <xsd:complexType name="Dummy" />
+      <xsd:element name="initialize">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="session" type="vin:WebSession" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="initializeResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="session" type="vin:WebSession" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="finalize">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="session" type="vin:WebSession" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="finalizeResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="session" type="vin:WebSession" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByVid">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="vid" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByVidResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="session" type="vin:WebSession" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="initialize_in">
+    <part element="tns:initialize" name="parameters" />
+  </message>
+  <message name="initialize_out">
+    <part element="tns:initializeResponse" name="parameters" />
+  </message>
+  <message name="finalize_in">
+    <part element="tns:finalize" name="parameters" />
+  </message>
+  <message name="finalize_out">
+    <part element="tns:finalizeResponse" name="parameters" />
+  </message>
+  <message name="fetchByVid_in">
+    <part element="tns:fetchByVid" name="parameters" />
+  </message>
+  <message name="fetchByVid_out">
+    <part element="tns:fetchByVidResponse" name="parameters" />
+  </message>
+  <portType name="WebSessionPortType">
+    <operation name="initialize">
+      <input message="tns:initialize_in" />
+      <output message="tns:initialize_out" />
+    </operation>
+    <operation name="finalize">
+      <input message="tns:finalize_in" />
+      <output message="tns:finalize_out" />
+    </operation>
+    <operation name="fetchByVid">
+      <input message="tns:fetchByVid_in" />
+      <output message="tns:fetchByVid_out" />
+    </operation>
+  </portType>
+  <binding name="WebSessionBinding" type="tns:WebSessionPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="initialize">
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/WebSession#initialize" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="finalize">
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/WebSession#finalize" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByVid">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads an object by Vindicia's unique ID<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>vid</b></dt>
+<dd>Vindicia ID for the object</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>session</b></dt>
+<dd>The session object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/WebSession#fetchByVid" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="WebSession">
+    <port binding="tns:WebSessionBinding" name="WebSessionPort">
+      <soap:address location="https://soap.vindicia.com/soap.pl" />
+    </port>
+  </service>
+</definitions>

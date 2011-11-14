@@ -1,0 +1,123 @@
+<definitions name="GiftCard" targetNamespace="http://soap.vindicia.com/v3_6/GiftCard" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.vindicia.com/v3_6/GiftCard" xmlns:vin="http://soap.vindicia.com/v3_6/Vindicia" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsdl="http://soap.vindicia.com/v3_6/GiftCard" >
+  <documentation>WSDL Specification for GiftCard</documentation>
+  <types>
+    <xsd:schema targetNamespace="http://soap.vindicia.com/v3_6/GiftCard">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:import namespace="http://soap.vindicia.com/v3_6/Vindicia" schemaLocation="./Vindicia.xsd" />
+      <xsd:element name="statusInquiry">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="giftcard" type="vin:GiftCard" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="statusInquiryResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element name="giftcard" type="vin:GiftCard" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="reverse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="giftcard" type="vin:GiftCard" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="reverseResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element name="giftcard" type="vin:GiftCard" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="statusInquiry_in">
+    <part element="tns:statusInquiry" name="parameters" />
+  </message>
+  <message name="statusInquiry_out">
+    <part element="tns:statusInquiryResponse" name="parameters" />
+  </message>
+  <message name="reverse_in">
+    <part element="tns:reverse" name="parameters" />
+  </message>
+  <message name="reverse_out">
+    <part element="tns:reverseResponse" name="parameters" />
+  </message>
+  <portType name="GiftCardPortType">
+    <operation name="statusInquiry">
+      <input message="tns:statusInquiry_in" />
+      <output message="tns:statusInquiry_out" />
+    </operation>
+    <operation name="reverse">
+      <input message="tns:reverse_in" />
+      <output message="tns:reverse_out" />
+    </operation>
+  </portType>
+  <binding name="GiftCardBinding" type="tns:GiftCardPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="statusInquiry">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Checks gift card status<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>giftcard</b></dt>
+<dd>The gift card</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>giftcard</b></dt>
+<dd>Gift card with updated status</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/GiftCard#statusInquiry" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="reverse">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Reverses the prior action performed on the gift card<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>giftcard</b></dt>
+<dd>The gift card</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>giftcard</b></dt>
+<dd>Gift card with updated status</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/GiftCard#reverse" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="GiftCard">
+    <port binding="tns:GiftCardBinding" name="GiftCardPort">
+      <soap:address location="https://soap.vindicia.com/soap.pl" />
+    </port>
+  </service>
+</definitions>

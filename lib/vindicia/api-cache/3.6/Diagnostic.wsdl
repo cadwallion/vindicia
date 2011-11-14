@@ -1,0 +1,569 @@
+<definitions name="Diagnostic" targetNamespace="http://soap.vindicia.com/v3_6/Diagnostic" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.vindicia.com/v3_6/Diagnostic" xmlns:vin="http://soap.vindicia.com/v3_6/Vindicia" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsdl="http://soap.vindicia.com/v3_6/Diagnostic" >
+  <documentation>WSDL Specification for Diagnostic</documentation>
+  <types>
+    <xsd:schema targetNamespace="http://soap.vindicia.com/v3_6/Diagnostic">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:import namespace="http://soap.vindicia.com/v3_6/Vindicia" schemaLocation="./Vindicia.xsd" />
+      <xsd:element name="getHello">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element minOccurs="0" name="quodlibet" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="getHelloResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element name="serverString" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="putHello">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="clientString" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="putHelloResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="serverEchoOfClientString" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="echoString">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="clientString" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="echoStringResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="serverEchoOfClientString" type="xsd:string" />
+            <xsd:element minOccurs="0" name="reference_ASCII_string" type="xsd:string" />
+            <xsd:element minOccurs="0" name="reference_non_ASCII_string" type="xsd:string" />
+            <xsd:element minOccurs="0" name="reference_non_Latin_string" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="echoStringByProxy">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="version" type="xsd:string" />
+            <xsd:element name="clientString" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="echoStringByProxyResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="serverEchoOfClientString" type="xsd:string" />
+            <xsd:element minOccurs="0" name="reference_ASCII_string" type="xsd:string" />
+            <xsd:element minOccurs="0" name="reference_non_ASCII_string" type="xsd:string" />
+            <xsd:element minOccurs="0" name="reference_non_Latin_string" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="getSomeMockTransactions">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element minOccurs="0" name="quodlibet" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="getSomeMockTransactionsResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="transactions" type="vin:Transaction" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="putSomeMockTransactions">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="transactions" type="vin:Transaction" />
+            <xsd:element name="extra" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="putSomeMockTransactionsResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element name="serverString" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="echoBoolean">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="clientBoolean" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="echoBooleanResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="serverEchoOfClientBoolean" type="xsd:boolean" />
+            <xsd:element minOccurs="0" name="serverEchoOfClientBooleanAsInt" type="xsd:integer" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="echoDateTime">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="clientDateTime" type="xsd:dateTime" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="echoDateTimeResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="serverEchoOfClientDateTime" type="xsd:dateTime" />
+            <xsd:element minOccurs="0" name="serverEchoOfClientDateTimeAsInt" type="xsd:integer" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="echoMockActivityFulfillment">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="clientActivityFulfillment" type="vin:ActivityFulfillment" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="echoMockActivityFulfillmentResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="serverEchoOfClientActivityFulfillment" type="vin:ActivityFulfillment" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="uselessUseOfDiagnosticObject">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="uselessInput" type="vin:Diagnostic" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="uselessUseOfDiagnosticObjectResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element name="uselessOutput" type="vin:Diagnostic" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="getHello_in">
+    <part element="tns:getHello" name="parameters" />
+  </message>
+  <message name="getHello_out">
+    <part element="tns:getHelloResponse" name="parameters" />
+  </message>
+  <message name="putHello_in">
+    <part element="tns:putHello" name="parameters" />
+  </message>
+  <message name="putHello_out">
+    <part element="tns:putHelloResponse" name="parameters" />
+  </message>
+  <message name="echoString_in">
+    <part element="tns:echoString" name="parameters" />
+  </message>
+  <message name="echoString_out">
+    <part element="tns:echoStringResponse" name="parameters" />
+  </message>
+  <message name="echoStringByProxy_in">
+    <part element="tns:echoStringByProxy" name="parameters" />
+  </message>
+  <message name="echoStringByProxy_out">
+    <part element="tns:echoStringByProxyResponse" name="parameters" />
+  </message>
+  <message name="getSomeMockTransactions_in">
+    <part element="tns:getSomeMockTransactions" name="parameters" />
+  </message>
+  <message name="getSomeMockTransactions_out">
+    <part element="tns:getSomeMockTransactionsResponse" name="parameters" />
+  </message>
+  <message name="putSomeMockTransactions_in">
+    <part element="tns:putSomeMockTransactions" name="parameters" />
+  </message>
+  <message name="putSomeMockTransactions_out">
+    <part element="tns:putSomeMockTransactionsResponse" name="parameters" />
+  </message>
+  <message name="echoBoolean_in">
+    <part element="tns:echoBoolean" name="parameters" />
+  </message>
+  <message name="echoBoolean_out">
+    <part element="tns:echoBooleanResponse" name="parameters" />
+  </message>
+  <message name="echoDateTime_in">
+    <part element="tns:echoDateTime" name="parameters" />
+  </message>
+  <message name="echoDateTime_out">
+    <part element="tns:echoDateTimeResponse" name="parameters" />
+  </message>
+  <message name="echoMockActivityFulfillment_in">
+    <part element="tns:echoMockActivityFulfillment" name="parameters" />
+  </message>
+  <message name="echoMockActivityFulfillment_out">
+    <part element="tns:echoMockActivityFulfillmentResponse" name="parameters" />
+  </message>
+  <message name="uselessUseOfDiagnosticObject_in">
+    <part element="tns:uselessUseOfDiagnosticObject" name="parameters" />
+  </message>
+  <message name="uselessUseOfDiagnosticObject_out">
+    <part element="tns:uselessUseOfDiagnosticObjectResponse" name="parameters" />
+  </message>
+  <portType name="DiagnosticPortType">
+    <operation name="getHello">
+      <input message="tns:getHello_in" />
+      <output message="tns:getHello_out" />
+    </operation>
+    <operation name="putHello">
+      <input message="tns:putHello_in" />
+      <output message="tns:putHello_out" />
+    </operation>
+    <operation name="echoString">
+      <input message="tns:echoString_in" />
+      <output message="tns:echoString_out" />
+    </operation>
+    <operation name="echoStringByProxy">
+      <input message="tns:echoStringByProxy_in" />
+      <output message="tns:echoStringByProxy_out" />
+    </operation>
+    <operation name="getSomeMockTransactions">
+      <input message="tns:getSomeMockTransactions_in" />
+      <output message="tns:getSomeMockTransactions_out" />
+    </operation>
+    <operation name="putSomeMockTransactions">
+      <input message="tns:putSomeMockTransactions_in" />
+      <output message="tns:putSomeMockTransactions_out" />
+    </operation>
+    <operation name="echoBoolean">
+      <input message="tns:echoBoolean_in" />
+      <output message="tns:echoBoolean_out" />
+    </operation>
+    <operation name="echoDateTime">
+      <input message="tns:echoDateTime_in" />
+      <output message="tns:echoDateTime_out" />
+    </operation>
+    <operation name="echoMockActivityFulfillment">
+      <input message="tns:echoMockActivityFulfillment_in" />
+      <output message="tns:echoMockActivityFulfillment_out" />
+    </operation>
+    <operation name="uselessUseOfDiagnosticObject">
+      <input message="tns:uselessUseOfDiagnosticObject_in" />
+      <output message="tns:uselessUseOfDiagnosticObject_out" />
+    </operation>
+  </portType>
+  <binding name="DiagnosticBinding" type="tns:DiagnosticPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="getHello">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Returns a hello world string<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>quodlibet</b></dt>
+<dd>put whatever you want here, or leave it out</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>serverString</b></dt>
+<dd>String should say hello world</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Diagnostic#getHello" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="putHello">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Acts nice if the input says hello world, otherwise returns bad status<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>clientString</b></dt>
+<dd>String should say hello world</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>serverEchoOfClientString</b></dt>
+<dd>String should echo back whatever the client said, or could leave it out</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Diagnostic#putHello" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="echoString">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Echoes back whatever string it is sent<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>clientString</b></dt>
+<dd>Arbitrary client string</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>serverEchoOfClientString</b></dt>
+<dd>String should echo back whatever the client said, or could leave it out</dd>
+<dt><b>reference_ASCII_string</b></dt>
+<dd>test ASCII string</dd>
+<dt><b>reference_non_ASCII_string</b></dt>
+<dd>test non-ASCII Latin string</dd>
+<dt><b>reference_non_Latin_string</b></dt>
+<dd>test non-ASCII non-Latin string</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Diagnostic#echoString" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="echoStringByProxy">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Takes a string and sends it to echoString, possibly using a different SOAP version<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>version</b></dt>
+<dd>Version of Diagnostic::echoString to use for reflective call</dd>
+<dt><b>clientString</b></dt>
+<dd>Arbitrary client string</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>serverEchoOfClientString</b></dt>
+<dd>String should echo back whatever the client said, or could leave it out</dd>
+<dt><b>reference_ASCII_string</b></dt>
+<dd>test ASCII string</dd>
+<dt><b>reference_non_ASCII_string</b></dt>
+<dd>test non-ASCII Latin string</dd>
+<dt><b>reference_non_Latin_string</b></dt>
+<dd>test non-ASCII non-Latin string</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Diagnostic#echoStringByProxy" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="getSomeMockTransactions">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Gets some transactions<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>quodlibet</b></dt>
+<dd>Put whatever you want here</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>transactions</b></dt>
+<dd>Array of mock transaction objects associated with a mock account</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Diagnostic#getSomeMockTransactions" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="putSomeMockTransactions">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Server will act nice if it gets an array of well-formed transactions<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>transactions</b></dt>
+<dd>Some mock transaction objects</dd>
+<dt><b>extra</b></dt>
+<dd>Used to check whether the server can find something that follows an array</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>serverString</b></dt>
+<dd>Server's comment about your transactions</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Diagnostic#putSomeMockTransactions" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="echoBoolean">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Echoes back a boolean value, both as sent and interpreted as an integer<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>clientBoolean</b></dt>
+<dd>Arbitrary client boolean</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>serverEchoOfClientBoolean</b></dt>
+<dd>Should be the same boolean the client sent</dd>
+<dt><b>serverEchoOfClientBooleanAsInt</b></dt>
+<dd>Should be 1 if the client sent true and 0 if false</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Diagnostic#echoBoolean" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="echoDateTime">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Echoes back a dateTime value, both as sent and interpreted as a Perl epoch integer<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>clientDateTime</b></dt>
+<dd>Arbitrary client dateTime</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>serverEchoOfClientDateTime</b></dt>
+<dd>Should be the same dateTime the client sent</dd>
+<dt><b>serverEchoOfClientDateTimeAsInt</b></dt>
+<dd>The given dateTime, interpreted as a Perl epoch integer</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Diagnostic#echoDateTime" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="echoMockActivityFulfillment">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Echoes back an ActivityFulfillment object. (This is mainly of interest because ActivityFulfillment contains xsd:boolean, xsd:dateTime and Address elements that we want to verify SOAP serialization for.) The object in this case will not be installed or matched to anything in our database and can have elements that are meaningless, as long as they are well-formed.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>clientActivityFulfillment</b></dt>
+<dd>Arbitrary client ActivityFulfillment object</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>serverEchoOfClientActivityFulfillment</b></dt>
+<dd>Should be the same ActivityFulfillment the client sent</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Diagnostic#echoMockActivityFulfillment" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="uselessUseOfDiagnosticObject">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Interface that takes a Diagnostic object and does nothing with it. Used to get around a problem with Axis wsdl2java: Our Java client library assumes that there will always be a "com.vindicia.soap.v3_X.Vindicia.Whatever" for an interface called "Whatever". The Diagnostic interface does not follow this pattern, and that breaks our Java client. So we throw this dummy method in so that we have at least one method that does follow the pattern.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>uselessInput</b></dt>
+<dd>Useless object to trick Axis</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>uselessOutput</b></dt>
+<dd>Useless object to trick Axis</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Diagnostic#uselessUseOfDiagnosticObject" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="Diagnostic">
+    <port binding="tns:DiagnosticBinding" name="DiagnosticPort">
+      <soap:address location="https://soap.vindicia.com/soap.pl" />
+    </port>
+  </service>
+</definitions>

@@ -1,0 +1,343 @@
+<definitions name="Product" targetNamespace="http://soap.vindicia.com/v3_6/Product" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.vindicia.com/v3_6/Product" xmlns:vin="http://soap.vindicia.com/v3_6/Vindicia" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsdl="http://soap.vindicia.com/v3_6/Product" >
+  <documentation>WSDL Specification for Product</documentation>
+  <types>
+    <xsd:schema targetNamespace="http://soap.vindicia.com/v3_6/Product">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:import namespace="http://soap.vindicia.com/v3_6/Vindicia" schemaLocation="./Vindicia.xsd" />
+      <xsd:element name="update">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="product" type="vin:Product" />
+            <xsd:element minOccurs="0" name="duplicateBehavior" type="vin:DuplicateBehavior" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="updateResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="product" type="vin:Product" />
+            <xsd:element name="created" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByVid">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="vid" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByVidResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="product" type="vin:Product" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByMerchantProductId">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="merchantProductId" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByMerchantProductIdResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="product" type="vin:Product" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByAccount">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element minOccurs="0" name="includeChildren" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByAccountResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="products" type="vin:Product" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchAll">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element minOccurs="0" name="page" type="xsd:int" />
+            <xsd:element minOccurs="0" name="pageSize" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchAllResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="products" type="vin:Product" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByMerchantEntitlementId">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="merchantEntitlementId" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByMerchantEntitlementIdResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="products" type="vin:Product" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="update_in">
+    <part element="tns:update" name="parameters" />
+  </message>
+  <message name="update_out">
+    <part element="tns:updateResponse" name="parameters" />
+  </message>
+  <message name="fetchByVid_in">
+    <part element="tns:fetchByVid" name="parameters" />
+  </message>
+  <message name="fetchByVid_out">
+    <part element="tns:fetchByVidResponse" name="parameters" />
+  </message>
+  <message name="fetchByMerchantProductId_in">
+    <part element="tns:fetchByMerchantProductId" name="parameters" />
+  </message>
+  <message name="fetchByMerchantProductId_out">
+    <part element="tns:fetchByMerchantProductIdResponse" name="parameters" />
+  </message>
+  <message name="fetchByAccount_in">
+    <part element="tns:fetchByAccount" name="parameters" />
+  </message>
+  <message name="fetchByAccount_out">
+    <part element="tns:fetchByAccountResponse" name="parameters" />
+  </message>
+  <message name="fetchAll_in">
+    <part element="tns:fetchAll" name="parameters" />
+  </message>
+  <message name="fetchAll_out">
+    <part element="tns:fetchAllResponse" name="parameters" />
+  </message>
+  <message name="fetchByMerchantEntitlementId_in">
+    <part element="tns:fetchByMerchantEntitlementId" name="parameters" />
+  </message>
+  <message name="fetchByMerchantEntitlementId_out">
+    <part element="tns:fetchByMerchantEntitlementIdResponse" name="parameters" />
+  </message>
+  <portType name="ProductPortType">
+    <operation name="update">
+      <input message="tns:update_in" />
+      <output message="tns:update_out" />
+    </operation>
+    <operation name="fetchByVid">
+      <input message="tns:fetchByVid_in" />
+      <output message="tns:fetchByVid_out" />
+    </operation>
+    <operation name="fetchByMerchantProductId">
+      <input message="tns:fetchByMerchantProductId_in" />
+      <output message="tns:fetchByMerchantProductId_out" />
+    </operation>
+    <operation name="fetchByAccount">
+      <input message="tns:fetchByAccount_in" />
+      <output message="tns:fetchByAccount_out" />
+    </operation>
+    <operation name="fetchAll">
+      <input message="tns:fetchAll_in" />
+      <output message="tns:fetchAll_out" />
+    </operation>
+    <operation name="fetchByMerchantEntitlementId">
+      <input message="tns:fetchByMerchantEntitlementId_in" />
+      <output message="tns:fetchByMerchantEntitlementId_out" />
+    </operation>
+  </portType>
+  <binding name="ProductBinding" type="tns:ProductPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="update">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Creates a new Product object, or updates an existing one.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>product</b></dt>
+<dd>Object to create</dd>
+<dt><b>duplicateBehavior</b></dt>
+<dd>What to do if a duplicate product is submitted</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>product</b></dt>
+<dd>The resultant object</dd>
+<dt><b>created</b></dt>
+<dd>True if the object was created new</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Product#update" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByVid">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads a product by Vindicia's unique ID<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>vid</b></dt>
+<dd>Vindicia ID for the object</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>product</b></dt>
+<dd>The resultant object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Product#fetchByVid" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByMerchantProductId">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads a product by mrchant's unique id<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>merchantProductId</b></dt>
+<dd>Merchant's unique id for this object</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>product</b></dt>
+<dd>The resultant object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Product#fetchByMerchantProductId" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByAccount">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads an array of products by Account object<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>Account to load by</dd>
+<dt><b>includeChildren</b></dt>
+<dd>If true, include in the result all the products for any child accounts of this account (if false, or if omitted, we will not include them)</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>products</b></dt>
+<dd>The resultant objects</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Product#fetchByAccount" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchAll">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>page</b></dt>
+<dd>The offset, based on pageSize, to return.</dd>
+<dt><b>pageSize</b></dt>
+<dd>The number of products to return per page.</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>products</b></dt>
+<dd>The resultant objects</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Product#fetchAll" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByMerchantEntitlementId">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads all Products that grant an entitlement<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>merchantEntitlementId</b></dt>
+<dd>Merchant's unique entitlement id</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>products</b></dt>
+<dd>The resultant objects</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Product#fetchByMerchantEntitlementId" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="Product">
+    <port binding="tns:ProductBinding" name="ProductPort">
+      <soap:address location="https://soap.vindicia.com/soap.pl" />
+    </port>
+  </service>
+</definitions>

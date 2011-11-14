@@ -1,0 +1,1289 @@
+<definitions name="AutoBill" targetNamespace="http://soap.vindicia.com/v3_6/AutoBill" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.vindicia.com/v3_6/AutoBill" xmlns:vin="http://soap.vindicia.com/v3_6/Vindicia" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsdl="http://soap.vindicia.com/v3_6/AutoBill" >
+  <documentation>WSDL Specification for AutoBill</documentation>
+  <types>
+    <xsd:schema targetNamespace="http://soap.vindicia.com/v3_6/AutoBill">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:import namespace="http://soap.vindicia.com/v3_6/Vindicia" schemaLocation="./Vindicia.xsd" />
+      <xsd:element name="update">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="autobill" type="vin:AutoBill" />
+            <xsd:element minOccurs="0" name="duplicateBehavior" type="vin:DuplicateBehavior" />
+            <xsd:element name="validatePaymentMethod" type="xsd:boolean" />
+            <xsd:element name="minChargebackProbability" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="updateResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="autobill" type="vin:AutoBill" />
+            <xsd:element name="created" type="xsd:boolean" />
+            <xsd:element minOccurs="0" name="authStatus" type="vin:TransactionStatus" />
+            <xsd:element minOccurs="0" name="firstBillDate" type="xsd:date" />
+            <xsd:element minOccurs="0" name="firstBillAmount" type="xsd:decimal" />
+            <xsd:element minOccurs="0" name="firstBillingCurrency" type="xsd:string" />
+            <xsd:element minOccurs="0" name="score" type="xsd:int" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="scoreCodes" type="vin:ScoreCode" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="upgrade">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="autobill" type="vin:AutoBill" />
+            <xsd:element minOccurs="0" name="skipOnetimeCharge" type="xsd:boolean" />
+            <xsd:element minOccurs="0" name="costLimit" type="xsd:float" />
+            <xsd:element name="effectiveDate" type="xsd:string" />
+            <xsd:element minOccurs="0" name="dryrun" type="xsd:boolean" />
+            <xsd:element name="negativeNet" type="vin:UpgradeNegativeNet" />
+            <xsd:element minOccurs="0" name="prorate" type="vin:UpgradeProrate" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="upgradeResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="autobill" type="vin:AutoBill" />
+            <xsd:element minOccurs="0" name="netcost" type="xsd:float" />
+            <xsd:element minOccurs="0" name="credit" type="xsd:float" />
+            <xsd:element minOccurs="0" name="debit" type="xsd:float" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchUpgradeHistoryByMerchantAutoBillId">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="merchantAutoBillId" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchUpgradeHistoryByMerchantAutoBillIdResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="upgradeHistorySteps" type="vin:AutoBillUpgradeHistoryStep" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchUpgradeHistoryByVid">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="vid" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchUpgradeHistoryByVidResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="upgradeHistorySteps" type="vin:AutoBillUpgradeHistoryStep" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="cancel">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="autobill" type="vin:AutoBill" />
+            <xsd:element name="disentitle" type="xsd:boolean" />
+            <xsd:element name="force" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="cancelResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="autobill" type="vin:AutoBill" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="delayBillingToDate">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="autobill" type="vin:AutoBill" />
+            <xsd:element name="newBillingDate" type="xsd:date" />
+            <xsd:element name="movePermanently" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="delayBillingToDateResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="autobill" type="vin:AutoBill" />
+            <xsd:element minOccurs="0" name="nextBillingDate" type="xsd:date" />
+            <xsd:element minOccurs="0" name="nextBillingAmount" type="xsd:decimal" />
+            <xsd:element minOccurs="0" name="nextBillingCurrency" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="delayBillingByDays">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="autobill" type="vin:AutoBill" />
+            <xsd:element name="delayDays" type="xsd:int" />
+            <xsd:element name="movePermanently" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="delayBillingByDaysResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="autobill" type="vin:AutoBill" />
+            <xsd:element minOccurs="0" name="nextBillingDate" type="xsd:date" />
+            <xsd:element minOccurs="0" name="nextBillingAmount" type="xsd:decimal" />
+            <xsd:element minOccurs="0" name="nextBillingCurrency" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="changeBillingDayOfMonth">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="autobill" type="vin:AutoBill" />
+            <xsd:element name="dayOfMonth" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="changeBillingDayOfMonthResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="autobill" type="vin:AutoBill" />
+            <xsd:element minOccurs="0" name="nextBillingDate" type="xsd:date" />
+            <xsd:element minOccurs="0" name="nextBillingAmount" type="xsd:decimal" />
+            <xsd:element minOccurs="0" name="nextBillingCurrency" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByAccountAndProduct">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element name="product" type="vin:Product" />
+            <xsd:element minOccurs="0" name="includeChildren" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByAccountAndProductResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="autobills" type="vin:AutoBill" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByMerchantAutoBillId">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="merchantAutoBillId" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByMerchantAutoBillIdResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="autobill" type="vin:AutoBill" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByVid">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="vid" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByVidResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="autobill" type="vin:AutoBill" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByWebSessionVid">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="vid" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByWebSessionVidResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="autobill" type="vin:AutoBill" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByEmail">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="email" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByEmailResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="autobills" type="vin:AutoBill" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByAccount">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element minOccurs="0" name="includeChildren" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByAccountResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="autobills" type="vin:AutoBill" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="futureRebills">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="autobill" type="vin:AutoBill" />
+            <xsd:element name="quantity" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="futureRebillsResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="transactions" type="vin:Transaction" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchDeltaSince">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="timestamp" type="xsd:dateTime" />
+            <xsd:element name="page" type="xsd:int" />
+            <xsd:element name="pageSize" type="xsd:int" />
+            <xsd:element minOccurs="0" name="endTimestamp" type="xsd:dateTime" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchDeltaSinceResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="autobills" type="vin:AutoBill" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="redeemGiftCard">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="autobill" type="vin:AutoBill" />
+            <xsd:element name="giftcard" type="vin:GiftCard" />
+            <xsd:element minOccurs="0" name="credit" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="redeemGiftCardResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="giftcard" type="vin:GiftCard" />
+            <xsd:element minOccurs="0" name="autobill" type="vin:AutoBill" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="grantCredit">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="autobill" type="vin:AutoBill" />
+            <xsd:element name="credit" type="vin:Credit" />
+            <xsd:element minOccurs="0" name="note" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="grantCreditResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="autobill" type="vin:AutoBill" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="revokeCredit">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="autobill" type="vin:AutoBill" />
+            <xsd:element name="credit" type="vin:Credit" />
+            <xsd:element minOccurs="0" name="note" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="revokeCreditResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="autobill" type="vin:AutoBill" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchCreditHistory">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="autobill" type="vin:AutoBill" />
+            <xsd:element name="timestamp" type="xsd:dateTime" />
+            <xsd:element name="endTimestamp" type="xsd:dateTime" />
+            <xsd:element name="page" type="xsd:int" />
+            <xsd:element name="pageSize" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchCreditHistoryResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="creditEventLogs" type="vin:CreditEventLog" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="finalizePayPalAuth">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="payPalTransactionId" type="xsd:string" />
+            <xsd:element name="success" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="finalizePayPalAuthResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="authStatus" type="vin:TransactionStatus" />
+            <xsd:element minOccurs="0" name="autobill" type="vin:AutoBill" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="update_in">
+    <part element="tns:update" name="parameters" />
+  </message>
+  <message name="update_out">
+    <part element="tns:updateResponse" name="parameters" />
+  </message>
+  <message name="upgrade_in">
+    <part element="tns:upgrade" name="parameters" />
+  </message>
+  <message name="upgrade_out">
+    <part element="tns:upgradeResponse" name="parameters" />
+  </message>
+  <message name="fetchUpgradeHistoryByMerchantAutoBillId_in">
+    <part element="tns:fetchUpgradeHistoryByMerchantAutoBillId" name="parameters" />
+  </message>
+  <message name="fetchUpgradeHistoryByMerchantAutoBillId_out">
+    <part element="tns:fetchUpgradeHistoryByMerchantAutoBillIdResponse" name="parameters" />
+  </message>
+  <message name="fetchUpgradeHistoryByVid_in">
+    <part element="tns:fetchUpgradeHistoryByVid" name="parameters" />
+  </message>
+  <message name="fetchUpgradeHistoryByVid_out">
+    <part element="tns:fetchUpgradeHistoryByVidResponse" name="parameters" />
+  </message>
+  <message name="cancel_in">
+    <part element="tns:cancel" name="parameters" />
+  </message>
+  <message name="cancel_out">
+    <part element="tns:cancelResponse" name="parameters" />
+  </message>
+  <message name="delayBillingToDate_in">
+    <part element="tns:delayBillingToDate" name="parameters" />
+  </message>
+  <message name="delayBillingToDate_out">
+    <part element="tns:delayBillingToDateResponse" name="parameters" />
+  </message>
+  <message name="delayBillingByDays_in">
+    <part element="tns:delayBillingByDays" name="parameters" />
+  </message>
+  <message name="delayBillingByDays_out">
+    <part element="tns:delayBillingByDaysResponse" name="parameters" />
+  </message>
+  <message name="changeBillingDayOfMonth_in">
+    <part element="tns:changeBillingDayOfMonth" name="parameters" />
+  </message>
+  <message name="changeBillingDayOfMonth_out">
+    <part element="tns:changeBillingDayOfMonthResponse" name="parameters" />
+  </message>
+  <message name="fetchByAccountAndProduct_in">
+    <part element="tns:fetchByAccountAndProduct" name="parameters" />
+  </message>
+  <message name="fetchByAccountAndProduct_out">
+    <part element="tns:fetchByAccountAndProductResponse" name="parameters" />
+  </message>
+  <message name="fetchByMerchantAutoBillId_in">
+    <part element="tns:fetchByMerchantAutoBillId" name="parameters" />
+  </message>
+  <message name="fetchByMerchantAutoBillId_out">
+    <part element="tns:fetchByMerchantAutoBillIdResponse" name="parameters" />
+  </message>
+  <message name="fetchByVid_in">
+    <part element="tns:fetchByVid" name="parameters" />
+  </message>
+  <message name="fetchByVid_out">
+    <part element="tns:fetchByVidResponse" name="parameters" />
+  </message>
+  <message name="fetchByWebSessionVid_in">
+    <part element="tns:fetchByWebSessionVid" name="parameters" />
+  </message>
+  <message name="fetchByWebSessionVid_out">
+    <part element="tns:fetchByWebSessionVidResponse" name="parameters" />
+  </message>
+  <message name="fetchByEmail_in">
+    <part element="tns:fetchByEmail" name="parameters" />
+  </message>
+  <message name="fetchByEmail_out">
+    <part element="tns:fetchByEmailResponse" name="parameters" />
+  </message>
+  <message name="fetchByAccount_in">
+    <part element="tns:fetchByAccount" name="parameters" />
+  </message>
+  <message name="fetchByAccount_out">
+    <part element="tns:fetchByAccountResponse" name="parameters" />
+  </message>
+  <message name="futureRebills_in">
+    <part element="tns:futureRebills" name="parameters" />
+  </message>
+  <message name="futureRebills_out">
+    <part element="tns:futureRebillsResponse" name="parameters" />
+  </message>
+  <message name="fetchDeltaSince_in">
+    <part element="tns:fetchDeltaSince" name="parameters" />
+  </message>
+  <message name="fetchDeltaSince_out">
+    <part element="tns:fetchDeltaSinceResponse" name="parameters" />
+  </message>
+  <message name="redeemGiftCard_in">
+    <part element="tns:redeemGiftCard" name="parameters" />
+  </message>
+  <message name="redeemGiftCard_out">
+    <part element="tns:redeemGiftCardResponse" name="parameters" />
+  </message>
+  <message name="grantCredit_in">
+    <part element="tns:grantCredit" name="parameters" />
+  </message>
+  <message name="grantCredit_out">
+    <part element="tns:grantCreditResponse" name="parameters" />
+  </message>
+  <message name="revokeCredit_in">
+    <part element="tns:revokeCredit" name="parameters" />
+  </message>
+  <message name="revokeCredit_out">
+    <part element="tns:revokeCreditResponse" name="parameters" />
+  </message>
+  <message name="fetchCreditHistory_in">
+    <part element="tns:fetchCreditHistory" name="parameters" />
+  </message>
+  <message name="fetchCreditHistory_out">
+    <part element="tns:fetchCreditHistoryResponse" name="parameters" />
+  </message>
+  <message name="finalizePayPalAuth_in">
+    <part element="tns:finalizePayPalAuth" name="parameters" />
+  </message>
+  <message name="finalizePayPalAuth_out">
+    <part element="tns:finalizePayPalAuthResponse" name="parameters" />
+  </message>
+  <portType name="AutoBillPortType">
+    <operation name="update">
+      <input message="tns:update_in" />
+      <output message="tns:update_out" />
+    </operation>
+    <operation name="upgrade">
+      <input message="tns:upgrade_in" />
+      <output message="tns:upgrade_out" />
+    </operation>
+    <operation name="fetchUpgradeHistoryByMerchantAutoBillId">
+      <input message="tns:fetchUpgradeHistoryByMerchantAutoBillId_in" />
+      <output message="tns:fetchUpgradeHistoryByMerchantAutoBillId_out" />
+    </operation>
+    <operation name="fetchUpgradeHistoryByVid">
+      <input message="tns:fetchUpgradeHistoryByVid_in" />
+      <output message="tns:fetchUpgradeHistoryByVid_out" />
+    </operation>
+    <operation name="cancel">
+      <input message="tns:cancel_in" />
+      <output message="tns:cancel_out" />
+    </operation>
+    <operation name="delayBillingToDate">
+      <input message="tns:delayBillingToDate_in" />
+      <output message="tns:delayBillingToDate_out" />
+    </operation>
+    <operation name="delayBillingByDays">
+      <input message="tns:delayBillingByDays_in" />
+      <output message="tns:delayBillingByDays_out" />
+    </operation>
+    <operation name="changeBillingDayOfMonth">
+      <input message="tns:changeBillingDayOfMonth_in" />
+      <output message="tns:changeBillingDayOfMonth_out" />
+    </operation>
+    <operation name="fetchByAccountAndProduct">
+      <input message="tns:fetchByAccountAndProduct_in" />
+      <output message="tns:fetchByAccountAndProduct_out" />
+    </operation>
+    <operation name="fetchByMerchantAutoBillId">
+      <input message="tns:fetchByMerchantAutoBillId_in" />
+      <output message="tns:fetchByMerchantAutoBillId_out" />
+    </operation>
+    <operation name="fetchByVid">
+      <input message="tns:fetchByVid_in" />
+      <output message="tns:fetchByVid_out" />
+    </operation>
+    <operation name="fetchByWebSessionVid">
+      <input message="tns:fetchByWebSessionVid_in" />
+      <output message="tns:fetchByWebSessionVid_out" />
+    </operation>
+    <operation name="fetchByEmail">
+      <input message="tns:fetchByEmail_in" />
+      <output message="tns:fetchByEmail_out" />
+    </operation>
+    <operation name="fetchByAccount">
+      <input message="tns:fetchByAccount_in" />
+      <output message="tns:fetchByAccount_out" />
+    </operation>
+    <operation name="futureRebills">
+      <input message="tns:futureRebills_in" />
+      <output message="tns:futureRebills_out" />
+    </operation>
+    <operation name="fetchDeltaSince">
+      <input message="tns:fetchDeltaSince_in" />
+      <output message="tns:fetchDeltaSince_out" />
+    </operation>
+    <operation name="redeemGiftCard">
+      <input message="tns:redeemGiftCard_in" />
+      <output message="tns:redeemGiftCard_out" />
+    </operation>
+    <operation name="grantCredit">
+      <input message="tns:grantCredit_in" />
+      <output message="tns:grantCredit_out" />
+    </operation>
+    <operation name="revokeCredit">
+      <input message="tns:revokeCredit_in" />
+      <output message="tns:revokeCredit_out" />
+    </operation>
+    <operation name="fetchCreditHistory">
+      <input message="tns:fetchCreditHistory_in" />
+      <output message="tns:fetchCreditHistory_out" />
+    </operation>
+    <operation name="finalizePayPalAuth">
+      <input message="tns:finalizePayPalAuth_in" />
+      <output message="tns:finalizePayPalAuth_out" />
+    </operation>
+  </portType>
+  <binding name="AutoBillBinding" type="tns:AutoBillPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="update">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Creates a new AutoBill object or updates an existing one.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>autobill</b></dt>
+<dd>Object to create</dd>
+<dt><b>duplicateBehavior</b></dt>
+<dd>This parameter is reserved for future use and is currently not supported</dd>
+<dt><b>validatePaymentMethod</b></dt>
+<dd>Validate the payment method before saving. AutoBill will not be saved if validation is requested and fails.</dd>
+<dt><b>minChargebackProbability</b></dt>
+<dd>If Chargeback Probability from risk scoring is greater than this, the transaction will fail. Default is 100 (all payment methods are applied).</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>autobill</b></dt>
+<dd>The resultant object</dd>
+<dt><b>created</b></dt>
+<dd>True if the object was created new</dd>
+<dt><b>authStatus</b></dt>
+<dd>If payment method validation was requested, this object will contain more information on response to the validation from the payment processor. You can examine this object for things such as Address Verification (AVS) response code, CVV response code, etc.</dd>
+<dt><b>firstBillDate</b></dt>
+<dd>Date of first billing on this object</dd>
+<dt><b>firstBillAmount</b></dt>
+<dd>Amount of first billing on this object</dd>
+<dt><b>firstBillingCurrency</b></dt>
+<dd>Currency of first billing on this object</dd>
+<dt><b>score</b></dt>
+<dd>
+          
+          The score of the transaction based upon the information
+          provided.  Ranges  from 0 (best) to 100 (worst).  May also be
+          -1, indicating that Vindicia has no opinion, or -2 indicating an
+          error condition.  -2 error transactions should be retried later
+          in order to complete the transaction database for chargeback
+          challenging.  Further information about why a given score was
+          returned is available in <b>scoreCodes</b>.  If the transaction score
+          is not acceptable, the score may be improved by presenting the
+          information in <b>scoreImprovements</b> to the user and resubmitting
+          a score call.
+          
+        </dd>
+<dt><b>scoreCodes</b></dt>
+<dd>Array containing strings that explain why the risk score came out be of a certain value</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#update" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="upgrade">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Upgrades an existing AutoBill.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>autobill</b></dt>
+<dd>Existing AutoBill id to upgrade, and template data for new AutoBill</dd>
+<dt><b>skipOnetimeCharge</b></dt>
+<dd>If there is a net onetime cost to the customer, do not charge it.</dd>
+<dt><b>costLimit</b></dt>
+<dd>If the net cost of the upgrade is greater than this, it will be rejected.</dd>
+<dt><b>effectiveDate</b></dt>
+<dd>Either the number of billing cycles to redo, or NEXT, TODAY, or RESTART</dd>
+<dt><b>dryrun</b></dt>
+<dd>True to only report what would have happened without committing.</dd>
+<dt><b>negativeNet</b></dt>
+<dd>What to do with a negative net cost: CREDIT or REFUND.</dd>
+<dt><b>prorate</b></dt>
+<dd>How to prorate the credit and debit when effectiveDate is TODAY.</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>autobill</b></dt>
+<dd>The resultant object</dd>
+<dt><b>netcost</b></dt>
+<dd>The net cost.</dd>
+<dt><b>credit</b></dt>
+<dd>The credit.</dd>
+<dt><b>debit</b></dt>
+<dd>The debit.</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#upgrade" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchUpgradeHistoryByMerchantAutoBillId">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Given a merchantAutoBillId, returns the AutoBill's upgrade history.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>merchantAutoBillId</b></dt>
+<dd>Merchant's unique ID for subscription. (If you give this ID for any item in the AutoBill's upgrade history, we will return the entire series.)</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>upgradeHistorySteps</b></dt>
+<dd>Array of steps in the AutoBill's history</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#fetchUpgradeHistoryByMerchantAutoBillId" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchUpgradeHistoryByVid">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Given a merchantAutoBillId, returns the AutoBill's upgrade history.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>vid</b></dt>
+<dd>Vindicia ID for the AutoBill. (If you give this ID for any item in the AutoBill's upgrade history, we will return the entire series.)</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>upgradeHistorySteps</b></dt>
+<dd>Array of steps in the AutoBill's history</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#fetchUpgradeHistoryByVid" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="cancel">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Cancels an AutoBill. Use the force flag to allow cancelling within a commitment period.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>autobill</b></dt>
+<dd>Object to create</dd>
+<dt><b>disentitle</b></dt>
+<dd>If true, also immediately disentitles the Account associated with this AutoBill for relevant Products.</dd>
+<dt><b>force</b></dt>
+<dd>If true, allows cancelling even if within a defined commitment period.</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>autobill</b></dt>
+<dd>The resultant object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#cancel" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="delayBillingToDate">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Delays next billing for the autobill until a particular date<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>autobill</b></dt>
+<dd>The AutoBill object</dd>
+<dt><b>newBillingDate</b></dt>
+<dd>Date to delay billing until</dd>
+<dt><b>movePermanently</b></dt>
+<dd>Make changes caused by this delay call permanent. If true, all billings after the date to which this call moves the next billing will be computed that day forward per billing periods used by the autobill</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>autobill</b></dt>
+<dd>The resultant object</dd>
+<dt><b>nextBillingDate</b></dt>
+<dd>Date of next billing after the delay</dd>
+<dt><b>nextBillingAmount</b></dt>
+<dd>Amount of next billing after the delay</dd>
+<dt><b>nextBillingCurrency</b></dt>
+<dd>Currency of next billing</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#delayBillingToDate" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="delayBillingByDays">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Delays next billing for the autobill a given number of days<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>autobill</b></dt>
+<dd>The AutoBill object</dd>
+<dt><b>delayDays</b></dt>
+<dd>Number of days to delay billing by</dd>
+<dt><b>movePermanently</b></dt>
+<dd>Make changes caused by this delay call permanent. If true, all billings after the date to which this call moves the next billing will be computed that day forward per billing periods used by the autobill</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>autobill</b></dt>
+<dd>The resultant object</dd>
+<dt><b>nextBillingDate</b></dt>
+<dd>Date of next billing after the delay</dd>
+<dt><b>nextBillingAmount</b></dt>
+<dd>Amount of next billing after the delay</dd>
+<dt><b>nextBillingCurrency</b></dt>
+<dd>Currency of next billing</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#delayBillingByDays" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="changeBillingDayOfMonth">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Delays a billing to a given day of the month. Note: You can also change the day in the AutoBill and call update but this function returns useful information.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>autobill</b></dt>
+<dd>The AutoBill object</dd>
+<dt><b>dayOfMonth</b></dt>
+<dd>Day of month to delay to, between 1 and 31, inclusive</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>autobill</b></dt>
+<dd>The resultant object</dd>
+<dt><b>nextBillingDate</b></dt>
+<dd>Date of next billing after the delay</dd>
+<dt><b>nextBillingAmount</b></dt>
+<dd>Amount of next billing after the delay</dd>
+<dt><b>nextBillingCurrency</b></dt>
+<dd>Currency of next billing</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#changeBillingDayOfMonth" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByAccountAndProduct">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads an array of autobills by an Account and Product<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>Account to load AutoBill for</dd>
+<dt><b>product</b></dt>
+<dd>Product to load AutoBill for</dd>
+<dt><b>includeChildren</b></dt>
+<dd>If true, include in the result all the autobills for any child accounts of this account (if false, or if omitted, we will not include them)</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>autobills</b></dt>
+<dd>The resultant object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#fetchByAccountAndProduct" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByMerchantAutoBillId">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads an autobill by merchants's unique id of subscribed item<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>merchantAutoBillId</b></dt>
+<dd>Merchant's unique id for subscription</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>autobill</b></dt>
+<dd>The resultant object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#fetchByMerchantAutoBillId" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByVid">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads an autobill by Vindicia's unique ID<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>vid</b></dt>
+<dd>Vindicia ID for the object</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>autobill</b></dt>
+<dd>The resultant object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#fetchByVid" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByWebSessionVid">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads an autobill by WebSession's unique ID<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>vid</b></dt>
+<dd>Vindicia ID for the WebSession object</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>autobill</b></dt>
+<dd>The resultant object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#fetchByWebSessionVid" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByEmail">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads an array of autobills by customer email<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>email</b></dt>
+<dd>Email address to load by</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>autobills</b></dt>
+<dd>The resultant object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#fetchByEmail" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByAccount">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads an array of autobills by Account object<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>Account to load by</dd>
+<dt><b>includeChildren</b></dt>
+<dd>If true, include in the result all the autobills for any child accounts of this account (if false, or if omitted, we will not include them)</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>autobills</b></dt>
+<dd>The resultant object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#fetchByAccount" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="futureRebills">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Returns projected future <a href="#data_type.Transaction">Transaction</a> objects for a given autobill object<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>autobill</b></dt>
+<dd>Object to create</dd>
+<dt><b>quantity</b></dt>
+<dd>Number of period to project forward</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>transactions</b></dt>
+<dd>The projected, future transactions</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#futureRebills" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchDeltaSince">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads a list of autobills that changed in status after the time stamp provided<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>timestamp</b></dt>
+<dd>All autobills that changed in status after this time stamp</dd>
+<dt><b>page</b></dt>
+<dd>page number to begin results returned, starts at 0.</dd>
+<dt><b>pageSize</b></dt>
+<dd>Number of results returned per page</dd>
+<dt><b>endTimestamp</b></dt>
+<dd>Upper limit on the time window to limit the search by. If unspecified, defaults to current time</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>autobills</b></dt>
+<dd>Array of AutoBill objects whose status changed after the timestamp</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#fetchDeltaSince" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="redeemGiftCard">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Redeems gift card for an autobill<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>autobill</b></dt>
+<dd>The autobill to which this gift card redemption applies</dd>
+<dt><b>giftcard</b></dt>
+<dd>The gift card being redeemed</dd>
+<dt><b>credit</b></dt>
+<dd>Number of credits to be redeemed from gift card (CURRENTLY UNSUPPORTED)</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>giftcard</b></dt>
+<dd>Gift card that was redeemed with updated status</dd>
+<dt><b>autobill</b></dt>
+<dd>AutoBill with updated credit as granted by gift card redemption</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#redeemGiftCard" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="grantCredit">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Grant credit to an autobill<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>autobill</b></dt>
+<dd>The autobill to which this credit grant applies</dd>
+<dt><b>credit</b></dt>
+<dd>Credits to be granted</dd>
+<dt><b>note</b></dt>
+<dd>Note regarding credit being granted</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>autobill</b></dt>
+<dd>The autobill with new credit balances for each changed credit</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#grantCredit" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="revokeCredit">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Decrement credits from an autobill<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>autobill</b></dt>
+<dd>The autobill to which this credit decrement applies</dd>
+<dt><b>credit</b></dt>
+<dd>Credits to be decremented</dd>
+<dt><b>note</b></dt>
+<dd>Note regarding credit being revoked</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>autobill</b></dt>
+<dd>The autobill with updated credit balances for each changed credit</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#revokeCredit" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchCreditHistory">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Fetch credit grant/decrement history for an autobill<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>autobill</b></dt>
+<dd>The AutoBill to which this request applies</dd>
+<dt><b>timestamp</b></dt>
+<dd>All credit events on or after this timestamp</dd>
+<dt><b>endTimestamp</b></dt>
+<dd>All credit events before this timestamp</dd>
+<dt><b>page</b></dt>
+<dd>Optional page number to begin results returned</dd>
+<dt><b>pageSize</b></dt>
+<dd>Optional number of results to display per a page</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>creditEventLogs</b></dt>
+<dd>Credit events (grants/revocations), with timestamp and type</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#fetchCreditHistory" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="finalizePayPalAuth">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Completes authorization of a PayPal payment method based validation transaction after the customer finishes authorization activities at PayPal web site and is redirected to your site by PayPal. The AutoBill will start billing only after this finalization is completed and the underlying validation transaction is authorized.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>payPalTransactionId</b></dt>
+<dd>Vindicia generated unique ID for the underlying PayPal validation transaction. This will be available to you via the URL when customer is redirected to your site by PayPal</dd>
+<dt><b>success</b></dt>
+<dd>Set this to true if PayPal redirected customer to your success web page (returnUrl). If PayPal redirected customer to your failure page (cancelUrl) set this to false</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>authStatus</b></dt>
+<dd>Status of the underlying validation transaction. This also contains response received from PayPal</dd>
+<dt><b>autobill</b></dt>
+<dd>Resultant AutoBill object. CashBox will populate this only if there was no error in processing this call.</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/AutoBill#finalizePayPalAuth" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="AutoBill">
+    <port binding="tns:AutoBillBinding" name="AutoBillPort">
+      <soap:address location="https://soap.vindicia.com/soap.pl" />
+    </port>
+  </service>
+</definitions>

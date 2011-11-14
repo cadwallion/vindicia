@@ -1,0 +1,89 @@
+<definitions name="MetricStatistics" targetNamespace="http://soap.vindicia.com/v3_6/MetricStatistics" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.vindicia.com/v3_6/MetricStatistics" xmlns:vin="http://soap.vindicia.com/v3_6/Vindicia" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsdl="http://soap.vindicia.com/v3_6/MetricStatistics" >
+  <documentation>WSDL Specification for MetricStatistics</documentation>
+  <types>
+    <xsd:schema targetNamespace="http://soap.vindicia.com/v3_6/MetricStatistics">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:import namespace="http://soap.vindicia.com/v3_6/Vindicia" schemaLocation="./Vindicia.xsd" />
+      <xsd:element name="report">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="method" type="xsd:string" />
+            <xsd:element name="begin" type="xsd:dateTime" />
+            <xsd:element name="end" type="xsd:dateTime" />
+            <xsd:element name="numFailed" type="xsd:int" />
+            <xsd:element maxOccurs="unbounded" minOccurs="1" name="stats" type="vin:MetricStatistics" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="reportResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="report_in">
+    <part element="tns:report" name="parameters" />
+  </message>
+  <message name="report_out">
+    <part element="tns:reportResponse" name="parameters" />
+  </message>
+  <portType name="MetricStatisticsPortType">
+    <operation name="report">
+      <input message="tns:report_in" />
+      <output message="tns:report_out" />
+    </operation>
+  </portType>
+  <binding name="MetricStatisticsBinding" type="tns:MetricStatisticsPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="report">
+      <xsd:annotation>
+        <xsd:documentation>
+<![CDATA[
+Records performance information from client-side.
+<dl>
+<dt><b>method</b></dt>
+<dd>The complete name of the method this data applies to.  To
+determine the complete name, begin with the targetNamespace as given
+in the WSDL file.  Remove the protocol and machine name, leaving just
+a class.  Prepend the string "Vindicia.Soap.".  Append the name of the
+method.  For example, for the method score() in the Transaction class,
+the targetNamespace is "http://soap.vindicia.com/Transaction".  Remove
+"http://soap.vindicia.com/" to get "Transaction".  Prepend
+"Vindicia.Soap." to get "Vindicia.Soap.Transaction".  Append "score"
+to get "Vindicia.Soap.Transaction.score" as the final report name.
+If this does not map to a known method, <b>report</b> will return a
+400.</dd>
+<dt><b>begin</b></dt>
+<dd>The timestamp of the first action reported in this report</dd>
+<dt><b>end</b></dt>
+<dd>The timestamp of the last action reported in this report, or the
+time of the report</dd>
+<dt><b>numFailed</b></dt>
+<dd>The number of calls which failed because of an inability to connect</dd>
+<dt><b>stats</b></dt>
+<dd>Array of <a
+href="#dataType.MetricStatistics">MetricStatistics</a>
+describing what statistics are being reported.</dd>
+</dl>
+]]>
+</xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/MetricStatistics#report" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="MetricStatistics">
+    <port binding="tns:MetricStatisticsBinding" name="MetricStatisticsPort">
+      <soap:address location="https://soap.vindicia.com/soap.pl" />
+    </port>
+  </service>
+</definitions>

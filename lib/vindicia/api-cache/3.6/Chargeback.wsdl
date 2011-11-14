@@ -1,0 +1,625 @@
+<definitions name="Chargeback" targetNamespace="http://soap.vindicia.com/v3_6/Chargeback" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.vindicia.com/v3_6/Chargeback" xmlns:vin="http://soap.vindicia.com/v3_6/Vindicia" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsdl="http://soap.vindicia.com/v3_6/Chargeback" >
+  <documentation>WSDL Specification for Chargeback</documentation>
+  <types>
+    <xsd:schema targetNamespace="http://soap.vindicia.com/v3_6/Chargeback">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:import namespace="http://soap.vindicia.com/v3_6/Vindicia" schemaLocation="./Vindicia.xsd" />
+      <xsd:element name="update">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="chargeback" type="vin:Chargeback" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="updateResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="chargeback" type="vin:Chargeback" />
+            <xsd:element name="created" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByVid">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="vid" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByVidResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="chargeback" type="vin:Chargeback" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByAccount">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element minOccurs="0" name="includeChildren" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByAccountResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="chargebacks" type="vin:Chargeback" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByCaseNumber">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="caseNumber" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByCaseNumberResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="chargebacks" type="vin:Chargeback" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByReferenceNumber">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="referenceNumber" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByReferenceNumberResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="chargebacks" type="vin:Chargeback" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByStatus">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="status" type="vin:ChargebackStatus" />
+            <xsd:element minOccurs="0" name="page" type="xsd:int" />
+            <xsd:element minOccurs="0" name="pageSize" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByStatusResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="chargebacks" type="vin:Chargeback" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByStatusSince">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="status" type="vin:ChargebackStatus" />
+            <xsd:element name="timestamp" type="xsd:dateTime" />
+            <xsd:element minOccurs="0" name="page" type="xsd:int" />
+            <xsd:element minOccurs="0" name="pageSize" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByStatusSinceResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="chargebacks" type="vin:Chargeback" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByMerchantTransactionId">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="merchantTransactionId" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByMerchantTransactionIdResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="chargebacks" type="vin:Chargeback" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchDeltaSince">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="timestamp" type="xsd:dateTime" />
+            <xsd:element name="endTimestamp" type="xsd:dateTime" />
+            <xsd:element minOccurs="0" name="page" type="xsd:int" />
+            <xsd:element minOccurs="0" name="pageSize" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchDeltaSinceResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="chargebacks" type="vin:Chargeback" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchDelta">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element minOccurs="0" name="pageSize" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchDeltaResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="chargebacks" type="vin:Chargeback" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="report">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="chargebacks" type="vin:Chargeback" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="reportResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="update_in">
+    <part element="tns:update" name="parameters" />
+  </message>
+  <message name="update_out">
+    <part element="tns:updateResponse" name="parameters" />
+  </message>
+  <message name="fetchByVid_in">
+    <part element="tns:fetchByVid" name="parameters" />
+  </message>
+  <message name="fetchByVid_out">
+    <part element="tns:fetchByVidResponse" name="parameters" />
+  </message>
+  <message name="fetchByAccount_in">
+    <part element="tns:fetchByAccount" name="parameters" />
+  </message>
+  <message name="fetchByAccount_out">
+    <part element="tns:fetchByAccountResponse" name="parameters" />
+  </message>
+  <message name="fetchByCaseNumber_in">
+    <part element="tns:fetchByCaseNumber" name="parameters" />
+  </message>
+  <message name="fetchByCaseNumber_out">
+    <part element="tns:fetchByCaseNumberResponse" name="parameters" />
+  </message>
+  <message name="fetchByReferenceNumber_in">
+    <part element="tns:fetchByReferenceNumber" name="parameters" />
+  </message>
+  <message name="fetchByReferenceNumber_out">
+    <part element="tns:fetchByReferenceNumberResponse" name="parameters" />
+  </message>
+  <message name="fetchByStatus_in">
+    <part element="tns:fetchByStatus" name="parameters" />
+  </message>
+  <message name="fetchByStatus_out">
+    <part element="tns:fetchByStatusResponse" name="parameters" />
+  </message>
+  <message name="fetchByStatusSince_in">
+    <part element="tns:fetchByStatusSince" name="parameters" />
+  </message>
+  <message name="fetchByStatusSince_out">
+    <part element="tns:fetchByStatusSinceResponse" name="parameters" />
+  </message>
+  <message name="fetchByMerchantTransactionId_in">
+    <part element="tns:fetchByMerchantTransactionId" name="parameters" />
+  </message>
+  <message name="fetchByMerchantTransactionId_out">
+    <part element="tns:fetchByMerchantTransactionIdResponse" name="parameters" />
+  </message>
+  <message name="fetchDeltaSince_in">
+    <part element="tns:fetchDeltaSince" name="parameters" />
+  </message>
+  <message name="fetchDeltaSince_out">
+    <part element="tns:fetchDeltaSinceResponse" name="parameters" />
+  </message>
+  <message name="fetchDelta_in">
+    <part element="tns:fetchDelta" name="parameters" />
+  </message>
+  <message name="fetchDelta_out">
+    <part element="tns:fetchDeltaResponse" name="parameters" />
+  </message>
+  <message name="report_in">
+    <part element="tns:report" name="parameters" />
+  </message>
+  <message name="report_out">
+    <part element="tns:reportResponse" name="parameters" />
+  </message>
+  <portType name="ChargebackPortType">
+    <operation name="update">
+      <input message="tns:update_in" />
+      <output message="tns:update_out" />
+    </operation>
+    <operation name="fetchByVid">
+      <input message="tns:fetchByVid_in" />
+      <output message="tns:fetchByVid_out" />
+    </operation>
+    <operation name="fetchByAccount">
+      <input message="tns:fetchByAccount_in" />
+      <output message="tns:fetchByAccount_out" />
+    </operation>
+    <operation name="fetchByCaseNumber">
+      <input message="tns:fetchByCaseNumber_in" />
+      <output message="tns:fetchByCaseNumber_out" />
+    </operation>
+    <operation name="fetchByReferenceNumber">
+      <input message="tns:fetchByReferenceNumber_in" />
+      <output message="tns:fetchByReferenceNumber_out" />
+    </operation>
+    <operation name="fetchByStatus">
+      <input message="tns:fetchByStatus_in" />
+      <output message="tns:fetchByStatus_out" />
+    </operation>
+    <operation name="fetchByStatusSince">
+      <input message="tns:fetchByStatusSince_in" />
+      <output message="tns:fetchByStatusSince_out" />
+    </operation>
+    <operation name="fetchByMerchantTransactionId">
+      <input message="tns:fetchByMerchantTransactionId_in" />
+      <output message="tns:fetchByMerchantTransactionId_out" />
+    </operation>
+    <operation name="fetchDeltaSince">
+      <input message="tns:fetchDeltaSince_in" />
+      <output message="tns:fetchDeltaSince_out" />
+    </operation>
+    <operation name="fetchDelta">
+      <input message="tns:fetchDelta_in" />
+      <output message="tns:fetchDelta_out" />
+    </operation>
+    <operation name="report">
+      <input message="tns:report_in" />
+      <output message="tns:report_out" />
+    </operation>
+  </portType>
+  <binding name="ChargebackBinding" type="tns:ChargebackPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="update">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Creates a new Chargeback object or updates an existing one.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>chargeback</b></dt>
+<dd>Object to create</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>chargeback</b></dt>
+<dd>The resultant object</dd>
+<dt><b>created</b></dt>
+<dd>True if the object was created new</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Chargeback#update" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByVid">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads a chargeback for a Vindicia ID<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>vid</b></dt>
+<dd>Vindicia ID for the object</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>chargeback</b></dt>
+<dd>The Chargeback object with this VID</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Chargeback#fetchByVid" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByAccount">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads chargebacks for an account<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>Account to load by</dd>
+<dt><b>includeChildren</b></dt>
+<dd>If true, include in the result all the chargebacks for any child accounts of this account (if false, or if omitted, we will not include them)</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>chargebacks</b></dt>
+<dd>Array of chargeback objects associated with account</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Chargeback#fetchByAccount" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByCaseNumber">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads chargebacks by a case number<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>caseNumber</b></dt>
+<dd>caseNumber to load by</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>chargebacks</b></dt>
+<dd>Array of chargeback objects associated with case number</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Chargeback#fetchByCaseNumber" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByReferenceNumber">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads chargebacks by a reference number<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>referenceNumber</b></dt>
+<dd>referenceNumber to load by</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>chargebacks</b></dt>
+<dd>Array of chargeback objects associated with reference number</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Chargeback#fetchByReferenceNumber" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByStatus">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads chargebacks for a chargeback staus<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>status</b></dt>
+<dd>Loads chargebacks for a chargeback status</dd>
+<dt><b>page</b></dt>
+<dd>The offset, based on pageSize, to return.</dd>
+<dt><b>pageSize</b></dt>
+<dd>The number of chargebacks to return per page.</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>chargebacks</b></dt>
+<dd>Array of chargeback objects associated with status</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Chargeback#fetchByStatus" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByStatusSince">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Retrieves chargebacks that have changed to given status since the provided timestamp<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>status</b></dt>
+<dd>Loads chargebacks for a chargeback status</dd>
+<dt><b>timestamp</b></dt>
+<dd>Matching chargebacks after this timestamp</dd>
+<dt><b>page</b></dt>
+<dd>The offset, based on pageSize, to return.</dd>
+<dt><b>pageSize</b></dt>
+<dd>The number of chargebacks to return per page.</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>chargebacks</b></dt>
+<dd>Array of chargeback objects associated with status</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Chargeback#fetchByStatusSince" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByMerchantTransactionId">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads chargebacks for a merchant transaction ID<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>merchantTransactionId</b></dt>
+<dd>Merchant's unique ID for transaction</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>chargebacks</b></dt>
+<dd>Array of chargeback objects associated with account</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Chargeback#fetchByMerchantTransactionId" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchDeltaSince">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>timestamp</b></dt>
+<dd>All chargebacks on or after this timestamp</dd>
+<dt><b>endTimestamp</b></dt>
+<dd>All chargebacks before this timestamp</dd>
+<dt><b>page</b></dt>
+<dd>The offset, based on pageSize, to return.</dd>
+<dt><b>pageSize</b></dt>
+<dd>The number of chargebacks to return per page.</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>chargebacks</b></dt>
+<dd></dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Chargeback#fetchDeltaSince" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchDelta">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+
+      
+      Returns an array of chargebacks that have been created or had status
+      changed since the last time Chargeback::fetchDelta was called.  Paging 
+      is supported via pageSize.  You should continue calling the function
+      until the length of the resulting array is 0.
+      
+    <p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>pageSize</b></dt>
+<dd>The number of chargebacks to return per page.</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>chargebacks</b></dt>
+<dd></dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Chargeback#fetchDelta" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="report">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Submits an array of chargebacks for processing. Mostly to be used by Vindicia internal software or merchant banks.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>chargebacks</b></dt>
+<dd></dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Chargeback#report" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="Chargeback">
+    <port binding="tns:ChargebackBinding" name="ChargebackPort">
+      <soap:address location="https://soap.vindicia.com/soap.pl" />
+    </port>
+  </service>
+</definitions>

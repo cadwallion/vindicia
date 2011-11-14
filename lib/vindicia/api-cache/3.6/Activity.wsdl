@@ -1,0 +1,101 @@
+<definitions name="Activity" targetNamespace="http://soap.vindicia.com/v3_6/Activity" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.vindicia.com/v3_6/Activity" xmlns:vin="http://soap.vindicia.com/v3_6/Vindicia" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsdl="http://soap.vindicia.com/v3_6/Activity" >
+  <documentation>WSDL Specification for Activity</documentation>
+  <types>
+    <xsd:schema targetNamespace="http://soap.vindicia.com/v3_6/Activity">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:import namespace="http://soap.vindicia.com/v3_6/Vindicia" schemaLocation="./Vindicia.xsd" />
+      <xsd:element name="record">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="activities" type="vin:Activity" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="recordResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="record_in">
+    <part element="tns:record" name="parameters" />
+  </message>
+  <message name="record_out">
+    <part element="tns:recordResponse" name="parameters" />
+  </message>
+  <portType name="ActivityPortType">
+    <operation name="record">
+      <input message="tns:record_in" />
+      <output message="tns:record_out" />
+    </operation>
+  </portType>
+  <binding name="ActivityBinding" type="tns:ActivityPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="record">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+
+
+Records non-transaction activity on a merchant's site.
+This method may either be called once per activity generated, or
+activities may be queued and submitted periodically.
+<p>
+The information gathered by this method is primarily used as evidence
+for disputing chargebacks.  The activity reported should be
+gathered with an eye towards this.  For example, there is no need to
+report every pageview on a site - the intent of the <a href="#data_type.ActivityURIView">ActivityURIView</a> activity
+is to report access to for-pay content, for example, the download of a
+song.  If you have any questions about which data it is best to
+report, please contact your service representative.
+<p>
+Each call to methodLink=record should include an array of
+<a href="#data_type.Activity">Activity</a>
+objects, with appropriate <a href="#data_type.ActivityTypeArg">ActivityTypeArg</a> 
+elements.
+<p>
+In addition to standard return codes,
+Activity may return the following special strings in
+<b>returnString</b>, both with a <b>returnCode</b> of 400:
+<dl>
+<dt>Error saving activity:  &lt;errorMsg&gt;</dt>
+<dd>Indicates a fatal error saving the activity.  If you receive this
+message, contact your service representative.</dd>
+<dt>Unknown activity type...</dt>
+<dd>Indiciates that an unknown (or unsupported) activity type was
+specified.</dd>
+</dl>
+<p>In any fatal error case (i.e., return codes of 300 or above)
+<b>all</b> activities reported are not saved and must be resubmitted.
+
+    <p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>activities</b></dt>
+<dd>Array of activities to be recorded</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Activity#record" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="Activity">
+    <port binding="tns:ActivityBinding" name="ActivityPort">
+      <soap:address location="https://soap.vindicia.com/soap.pl" />
+    </port>
+  </service>
+</definitions>

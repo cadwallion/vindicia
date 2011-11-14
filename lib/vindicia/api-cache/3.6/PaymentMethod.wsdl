@@ -1,0 +1,401 @@
+<definitions name="PaymentMethod" targetNamespace="http://soap.vindicia.com/v3_6/PaymentMethod" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.vindicia.com/v3_6/PaymentMethod" xmlns:vin="http://soap.vindicia.com/v3_6/Vindicia" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsdl="http://soap.vindicia.com/v3_6/PaymentMethod" >
+  <documentation>WSDL Specification for PaymentMethod</documentation>
+  <types>
+    <xsd:schema targetNamespace="http://soap.vindicia.com/v3_6/PaymentMethod">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:import namespace="http://soap.vindicia.com/v3_6/Vindicia" schemaLocation="./Vindicia.xsd" />
+      <xsd:element name="update">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="paymentMethod" type="vin:PaymentMethod" />
+            <xsd:element name="validate" type="xsd:boolean" />
+            <xsd:element name="minChargebackProbability" type="xsd:int" />
+            <xsd:element name="replaceOnAllAutoBills" type="xsd:boolean" />
+            <xsd:element minOccurs="0" name="sourceIp" type="xsd:string" />
+            <xsd:element minOccurs="0" name="replaceOnAllChildAutoBills" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="updateResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="paymentMethod" type="vin:PaymentMethod" />
+            <xsd:element name="created" type="xsd:boolean" />
+            <xsd:element name="validated" type="xsd:boolean" />
+            <xsd:element minOccurs="0" name="score" type="xsd:int" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="scoreCodes" type="vin:ScoreCode" />
+            <xsd:element minOccurs="0" name="authStatus" type="vin:TransactionStatus" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByVid">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="vid" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByVidResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="paymentMethod" type="vin:PaymentMethod" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByWebSessionVid">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="vid" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByWebSessionVidResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="paymentMethod" type="vin:PaymentMethod" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByAccount">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element minOccurs="0" name="includeChildren" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByAccountResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="paymentMethods" type="vin:PaymentMethod" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByMerchantPaymentMethodId">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="paymentMethodId" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByMerchantPaymentMethodIdResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="paymentMethod" type="vin:PaymentMethod" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="validate">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="paymentMethod" type="vin:PaymentMethod" />
+            <xsd:element minOccurs="0" name="sourceIp" type="xsd:string" />
+            <xsd:element name="minChargebackProbability" type="xsd:int" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="validateResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="authStatus" type="vin:TransactionStatus" />
+            <xsd:element name="validated" type="xsd:boolean" />
+            <xsd:element minOccurs="0" name="score" type="xsd:int" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="scoreCodes" type="vin:ScoreCode" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="update_in">
+    <part element="tns:update" name="parameters" />
+  </message>
+  <message name="update_out">
+    <part element="tns:updateResponse" name="parameters" />
+  </message>
+  <message name="fetchByVid_in">
+    <part element="tns:fetchByVid" name="parameters" />
+  </message>
+  <message name="fetchByVid_out">
+    <part element="tns:fetchByVidResponse" name="parameters" />
+  </message>
+  <message name="fetchByWebSessionVid_in">
+    <part element="tns:fetchByWebSessionVid" name="parameters" />
+  </message>
+  <message name="fetchByWebSessionVid_out">
+    <part element="tns:fetchByWebSessionVidResponse" name="parameters" />
+  </message>
+  <message name="fetchByAccount_in">
+    <part element="tns:fetchByAccount" name="parameters" />
+  </message>
+  <message name="fetchByAccount_out">
+    <part element="tns:fetchByAccountResponse" name="parameters" />
+  </message>
+  <message name="fetchByMerchantPaymentMethodId_in">
+    <part element="tns:fetchByMerchantPaymentMethodId" name="parameters" />
+  </message>
+  <message name="fetchByMerchantPaymentMethodId_out">
+    <part element="tns:fetchByMerchantPaymentMethodIdResponse" name="parameters" />
+  </message>
+  <message name="validate_in">
+    <part element="tns:validate" name="parameters" />
+  </message>
+  <message name="validate_out">
+    <part element="tns:validateResponse" name="parameters" />
+  </message>
+  <portType name="PaymentMethodPortType">
+    <operation name="update">
+      <input message="tns:update_in" />
+      <output message="tns:update_out" />
+    </operation>
+    <operation name="fetchByVid">
+      <input message="tns:fetchByVid_in" />
+      <output message="tns:fetchByVid_out" />
+    </operation>
+    <operation name="fetchByWebSessionVid">
+      <input message="tns:fetchByWebSessionVid_in" />
+      <output message="tns:fetchByWebSessionVid_out" />
+    </operation>
+    <operation name="fetchByAccount">
+      <input message="tns:fetchByAccount_in" />
+      <output message="tns:fetchByAccount_out" />
+    </operation>
+    <operation name="fetchByMerchantPaymentMethodId">
+      <input message="tns:fetchByMerchantPaymentMethodId_in" />
+      <output message="tns:fetchByMerchantPaymentMethodId_out" />
+    </operation>
+    <operation name="validate">
+      <input message="tns:validate_in" />
+      <output message="tns:validate_out" />
+    </operation>
+  </portType>
+  <binding name="PaymentMethodBinding" type="tns:PaymentMethodPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="update">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Creates a new PaymentMethod object or updates an existing one.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>paymentMethod</b></dt>
+<dd>Object to create</dd>
+<dt><b>validate</b></dt>
+<dd>Whether to just update or validate first</dd>
+<dt><b>minChargebackProbability</b></dt>
+<dd>If Chargeback Probability from risk scoring is greater than this, the transaction will fail. Default is 100 (all payment methods are applied).</dd>
+<dt><b>replaceOnAllAutoBills</b></dt>
+<dd>Set to true if you want the updates to the payment method to propagate to all autobills using this payment method. Defaults to false meaning no autobills will be updated</dd>
+<dt><b>sourceIp</b></dt>
+<dd>Source IP this payment method was requested from (the customer's, not the merchant's). Useful in fraud prevention.</dd>
+<dt><b>replaceOnAllChildAutoBills</b></dt>
+<dd>If true, the update will propagate to the autobills belonging to children of this account. If replaceOnAllAutoBills is false, this will be ignored. If replaceOnAllAutoBills is true and replaceOnAllChildAutoBills is true, this will affect only the parent account.</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>paymentMethod</b></dt>
+<dd>The resultant object</dd>
+<dt><b>created</b></dt>
+<dd>True if the object was created new</dd>
+<dt><b>validated</b></dt>
+<dd>True if the payment method was successfully validated</dd>
+<dt><b>score</b></dt>
+<dd>
+          
+          The score of the transaction based upon the information
+          provided.  Ranges  from 0 (best) to 100 (worst).  May also be
+          -1, indicating that Vindicia has no opinion, or -2 indicating an
+          error condition.  -2 error transactions should be retried later
+          in order to complete the transaction database for chargeback
+          challenging.  Further information about why a given score was
+          returned is available in <b>scoreCodes</b>.  If the transaction score
+          is not acceptable, the score may be improved by presenting the
+          information in <b>scoreImprovements</b> to the user and resubmitting
+          a score call.
+          
+        </dd>
+<dt><b>scoreCodes</b></dt>
+<dd>Array containing strings that explain why the risk score came out be of a certain value</dd>
+<dt><b>authStatus</b></dt>
+<dd>If payment method validation was requested, this object will contain more information on response to the validation from the payment processor. You can examine this object for things such as Address Verification (AVS) response code, CVV response code, etc.</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/PaymentMethod#update" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByVid">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads a PaymentMethod by Vindicia's unique ID<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>vid</b></dt>
+<dd>Vindicia ID for the object</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>paymentMethod</b></dt>
+<dd>The resultant object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/PaymentMethod#fetchByVid" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByWebSessionVid">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads a PaymentMethod by WebSession's unique ID<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>vid</b></dt>
+<dd>Vindicia ID for the WebSession object</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>paymentMethod</b></dt>
+<dd>The resultant object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/PaymentMethod#fetchByWebSessionVid" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByAccount">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads a list of PaymentMethods by the Account that owns them<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>Account for which to retrieve associated PaymentMethods. Account object should have at least one of VID or merchantAccountId set (if both are set, VID is checked first).</dd>
+<dt><b>includeChildren</b></dt>
+<dd>If true, include in the result all the payment methods for any child accounts of this account (if false, or if omitted, we will not include them)</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>paymentMethods</b></dt>
+<dd>The resultant objects</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/PaymentMethod#fetchByAccount" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByMerchantPaymentMethodId">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads a PaymentMethod by Merchant's unique ID for the payment method<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>paymentMethodId</b></dt>
+<dd>Merchant ID for the payment method</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>paymentMethod</b></dt>
+<dd>The resultant object</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/PaymentMethod#fetchByMerchantPaymentMethodId" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="validate">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Evaluates a PaymentMethod for fraud and validates it by contacting a payment processor and assures its correctness<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>paymentMethod</b></dt>
+<dd>The PaymentMethod to validate.</dd>
+<dt><b>sourceIp</b></dt>
+<dd>Source IP this payment method was requested from (the customer's, not the merchant's). Necessary for fraud risk scoring.</dd>
+<dt><b>minChargebackProbability</b></dt>
+<dd>Chargeback Probablity evaluated for this payment method from fraud risk scoring is greater than this, Vindicia will not contact your payment processor for further validation of the payment method. If you do not want fraud score evaluated, set this to its maximum possible value of 100. If you set this below 100, you should specify the sourceIp parameter and the payment method should contain full billing address.</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>authStatus</b></dt>
+<dd>If the payment processor was contacted for validation, this object will contain more information on response to the validation from the payment processor. You can examine this object for things such as Address Verification (AVS) response code, CVV response code, etc.</dd>
+<dt><b>validated</b></dt>
+<dd>True if the payment method was successfully validated. This will be available if the fraud score was satisfactory and validation was done by contacting the payment processor</dd>
+<dt><b>score</b></dt>
+<dd>
+          
+          The fraud score of for the payment method based on the information
+          provided.  Ranges  from 0 (best) to 100 (worst).  May also be
+          -1, indicating that Vindicia has no opinion, or -2 indicating an
+          error condition.  -2 error validation should be retried later.
+          Further information about why a given score was
+          returned is available in <b>scoreCodes</b>.  
+          
+        </dd>
+<dt><b>scoreCodes</b></dt>
+<dd>Array containing strings that explain why the risk score came out be of a certain value</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/PaymentMethod#validate" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="PaymentMethod">
+    <port binding="tns:PaymentMethodBinding" name="PaymentMethodPort">
+      <soap:address location="https://soap.vindicia.com/soap.pl" />
+    </port>
+  </service>
+</definitions>

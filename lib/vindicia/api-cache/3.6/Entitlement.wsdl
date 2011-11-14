@@ -1,0 +1,193 @@
+<definitions name="Entitlement" targetNamespace="http://soap.vindicia.com/v3_6/Entitlement" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.vindicia.com/v3_6/Entitlement" xmlns:vin="http://soap.vindicia.com/v3_6/Vindicia" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsdl="http://soap.vindicia.com/v3_6/Entitlement" >
+  <documentation>WSDL Specification for Entitlement</documentation>
+  <types>
+    <xsd:schema targetNamespace="http://soap.vindicia.com/v3_6/Entitlement">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:import namespace="http://soap.vindicia.com/v3_6/Vindicia" schemaLocation="./Vindicia.xsd" />
+      <xsd:element name="fetchByEntitlementIdAndAccount">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="entitlementId" type="xsd:string" />
+            <xsd:element name="account" type="vin:Account" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByEntitlementIdAndAccountResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element minOccurs="0" name="entitlement" type="vin:Entitlement" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByAccount">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="account" type="vin:Account" />
+            <xsd:element name="showAll" type="xsd:boolean" />
+            <xsd:element minOccurs="0" name="includeChildren" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchByAccountResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="entitlements" type="vin:Entitlement" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchDeltaSince">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="auth" type="vin:Authentication" />
+            <xsd:element name="timestamp" type="xsd:dateTime" />
+            <xsd:element name="page" type="xsd:int" />
+            <xsd:element name="pageSize" type="xsd:int" />
+            <xsd:element minOccurs="0" name="endTimestamp" type="xsd:dateTime" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="fetchDeltaSinceResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="return" type="vin:Return" />
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="entitlements" type="vin:Entitlement" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+  <message name="fetchByEntitlementIdAndAccount_in">
+    <part element="tns:fetchByEntitlementIdAndAccount" name="parameters" />
+  </message>
+  <message name="fetchByEntitlementIdAndAccount_out">
+    <part element="tns:fetchByEntitlementIdAndAccountResponse" name="parameters" />
+  </message>
+  <message name="fetchByAccount_in">
+    <part element="tns:fetchByAccount" name="parameters" />
+  </message>
+  <message name="fetchByAccount_out">
+    <part element="tns:fetchByAccountResponse" name="parameters" />
+  </message>
+  <message name="fetchDeltaSince_in">
+    <part element="tns:fetchDeltaSince" name="parameters" />
+  </message>
+  <message name="fetchDeltaSince_out">
+    <part element="tns:fetchDeltaSinceResponse" name="parameters" />
+  </message>
+  <portType name="EntitlementPortType">
+    <operation name="fetchByEntitlementIdAndAccount">
+      <input message="tns:fetchByEntitlementIdAndAccount_in" />
+      <output message="tns:fetchByEntitlementIdAndAccount_out" />
+    </operation>
+    <operation name="fetchByAccount">
+      <input message="tns:fetchByAccount_in" />
+      <output message="tns:fetchByAccount_out" />
+    </operation>
+    <operation name="fetchDeltaSince">
+      <input message="tns:fetchDeltaSince_in" />
+      <output message="tns:fetchDeltaSince_out" />
+    </operation>
+  </portType>
+  <binding name="EntitlementBinding" type="tns:EntitlementPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="fetchByEntitlementIdAndAccount">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads an entitlement by its unique merchant id and the Account that owns it.<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>entitlementId</b></dt>
+<dd>The unique id of the entitlement</dd>
+<dt><b>account</b></dt>
+<dd>The account that owns the entitlement</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>entitlement</b></dt>
+<dd>Entitlement for a given Account</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Entitlement#fetchByEntitlementIdAndAccount" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchByAccount">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads list of entitlements by the Account that owns them<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>account</b></dt>
+<dd>The account that owns the entitlement</dd>
+<dt><b>showAll</b></dt>
+<dd>If true, show all entitlements, including those that have expired. Otherwise, only active entitlements will be returned.</dd>
+<dt><b>includeChildren</b></dt>
+<dd>If true, include in the result all the entitlements for any child accounts of this account (if false, or if omitted, we will not include them)</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>entitlements</b></dt>
+<dd>List of entitlements for a given Account</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Entitlement#fetchByAccount" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+    <operation name="fetchDeltaSince">
+      <xsd:annotation>
+        <xsd:documentation><![CDATA[
+Loads a list of entitlements that may have been affected since provided timestamp in ascending order of the time when an autobill, a billing plan, or a product changed in such a way as to affect the associated entitlements. These changes may not necessarily change active status of an entitlement depending on the time when the entitlement was fetched, but it will still be returned by this call. The latest entitlement returned by this call for an account should be considered the most up to date for that account. It is expected that merchants will make this call at appropriate regular intervals and with suitable paging parameters to limit the number of objects returned by the call<p>
+<h4>Input Fields</h4><dl>
+<dt><b>auth</b></dt>
+<dd>Credentials required to authenticate this request</dd>
+<dt><b>timestamp</b></dt>
+<dd>Time stamp to use as search criterion</dd>
+<dt><b>page</b></dt>
+<dd>Page number to begin results returned, starts at 0</dd>
+<dt><b>pageSize</b></dt>
+<dd>Number of results to display per a page</dd>
+<dt><b>endTimestamp</b></dt>
+<dd>Upper limit on the time window to limit the search by. If unspecified, defaults to current time</dd>
+</dl>
+<h4>Output Fields</h4><dl>
+<dt><b>return</b></dt>
+<dd>Basic results of this request (success, failure, error, etc.)</dd>
+<dt><b>entitlements</b></dt>
+<dd>Array of Entitlement objects that may have been affected since the timestamp</dd>
+</dl>
+]]></xsd:documentation>
+      </xsd:annotation>
+      <soap:operation soapAction="http://soap.vindicia.com/v3_6/Entitlement#fetchDeltaSince" />
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="Entitlement">
+    <port binding="tns:EntitlementBinding" name="EntitlementPort">
+      <soap:address location="https://soap.vindicia.com/soap.pl" />
+    </port>
+  </service>
+</definitions>
