@@ -52,17 +52,27 @@ module Vindicia
     # @param [String] - class name that maps to Vindicia SOAP APIs
     # @return Class - class defined
     def bootstrap_class(class_name)
-      if valid_soap_api? Vindicia.wsdl(class_name)
+      if valid_soap_api? class_name
         klass = const_set(class_name.to_sym, Class.new do
           extend Vindicia::Bootstrap::ClassMethods
         end)
 
-        klass.client.wsdl.document = Vindicia.wsdl(class_name)
+        klass.client.wsdl.document = determine_wsdl(class_name)
 
         klass.client.wsdl.soap_actions.each do |method|
           bootstrapped_method = bootstrap_method(method)
           klass.module_eval &bootstrapped_method
         end
+      end
+    end
+
+    def determine_wsdl class_name
+      local_path = File.dirname(__FILE__)+"/api-cache/#{Vindicia.version}/#{class_name}.wsdl"
+      if File.exists? local_path
+        puts "cache hit"
+        return local_path
+      else
+        Vindicia.wsdl(class_name)
       end
     end
 
@@ -95,13 +105,27 @@ module Vindicia
     end
 
     
-    def valid_soap_api? wsdl_loc
-      xsd_response = Net::HTTP.get_response(URI.parse(wsdl_loc)) 
-      
-      if xsd_response.code == '200'
-        true
+    def valid_soap_api? class_name
+      wsdl = determine_wsdl(class_name)
+      if File.exists? wsdl
+        return true
       else
-        false
+        xsd_response = Net::HTTP.get_response(URI.parse(wsdl)) 
+        
+        if xsd_response.code == '200'
+          cache_wsdl(class_name, xsd_response.body)
+          true
+        else
+          false
+        end
+      end
+    end
+
+    def cache_wsdl class_name, wsdl_body
+      cache_path = "#{File.dirname(__FILE__)}/api-cache/#{Vindicia.version}"
+      FileUtils.mkdir_p cache_path
+      File.open("#{cache_path}/#{class_name}.wsdl", "w+") do |file|
+        file << wsdl_body
       end
     end
   end

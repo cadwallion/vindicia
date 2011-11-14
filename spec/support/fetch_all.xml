@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" 
+    xmlns:vin="http://soap.vindicia.com/v3_6/Vindicia" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" 
+    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <fetchAllResponse xmlns="http://soap.vindicia.com/v3_6/Product">
+      <return xmlns="" xsi:type="vin:Return">
+        <returnCode xsi:type="vin:ReturnCode">200</returnCode>
+
+        <soapId xsi:type="xsd:string">7005b41f54317c6bc84f30b0a9c557206433c073</soapId>
+
+        <returnString xsi:type="xsd:string">OK</returnString>
+      </return>
+
+      <products xmlns="" xsi:type="vin:Product">
+        <VID xmlns="" xsi:type="xsd:string">d58d3cc854007c1e897907c6e87591cb657c5467</VID>
+
+        <merchantProductId xmlns="" xsi:type="xsd:string">MLG-GOLD-MEMBERSHIP</merchantProductId>
+
+        <status xmlns="" xsi:type="vin:ProductStatus">Active</status>
+
+        <defaultBillingPlan xmlns="" xsi:type="vin:BillingPlan">
+          <VID xmlns="" xsi:type="xsd:string">cf75614265be15ad430f7419b3993eab93fe08ea</VID>
+
+          <merchantBillingPlanId xmlns="" xsi:type="xsd:string">Premium_12_Month</merchantBillingPlanId>
+
+          <description xmlns="" xsi:type="xsd:string">MLG Premium Membership (Yearly)</description>
+
+          <status xmlns="" xsi:type="vin:BillingPlanStatus">Active</status>
+
+          <periods xmlns="" xsi:type="vin:BillingPlanPeriod">
+            <type xmlns="" xsi:type="vin:BillingPeriodType">Year</type>
+
+            <quantity xmlns="" xsi:type="xsd:int">1</quantity>
+
+            <cycles xmlns="" xsi:type="xsd:int">1</cycles>
+
+            <prices xmlns="" xsi:type="vin:BillingPlanPrice">
+              <amount xmlns="" xsi:type="xsd:decimal">0</amount>
+
+              <currency xmlns="" xsi:type="xsd:string">USD</currency>
+            </prices>
+
+            <expireWarningDays xmlns="" xsi:type="xsd:int">5</expireWarningDays>
+
+            <doNotNotifyFirstBill xmlns="" xsi:type="xsd:boolean">1</doNotNotifyFirstBill>
+          </periods>
+
+          <periods xmlns="" xsi:type="vin:BillingPlanPeriod">
+            <type xmlns="" xsi:type="vin:BillingPeriodType">Year</type>
+
+            <quantity xmlns="" xsi:type="xsd:int">1</quantity>
+
+            <cycles xmlns="" xsi:type="xsd:int">0</cycles>
+
+            <prices xmlns="" xsi:type="vin:BillingPlanPrice">
+              <amount xmlns="" xsi:type="xsd:decimal">29.99</amount>
+
+              <currency xmlns="" xsi:type="xsd:string">USD</currency>
+            </prices>
+
+            <expireWarningDays xmlns="" xsi:type="xsd:int">5</expireWarningDays>
+
+            <doNotNotifyFirstBill xmlns="" xsi:type="xsd:boolean">1</doNotNotifyFirstBill>
+          </periods>
+
+          <prenotifyDays xmlns="" xsi:type="xsd:int">5</prenotifyDays>
+
+          <merchantEntitlementIds xmlns="" xsi:type="vin:MerchantEntitlementId">
+            <id xmlns="" xsi:type="xsd:string">PremiumMembership</id>
+
+            <description xmlns="" xsi:type="xsd:string">MLG Premium Membership</description>
+          </merchantEntitlementIds>
+
+          <merchantEntitlementIds xmlns="" xsi:type="vin:MerchantEntitlementId">
+            <id xmlns="" xsi:type="xsd:string">GoldMembership</id>
+
+            <description xmlns="" xsi:type="xsd:string">Gold Membership</description>
+          </merchantEntitlementIds>
+
+          <billingStatementIdentifier xmlns="" xsi:type="xsd:string">MLG_TBD</billingStatementIdentifier>
+        </defaultBillingPlan>
+      </products>
+
+      <products xmlns="" xsi:type="vin:Product">
+        <VID xmlns="" xsi:type="xsd:string">8e534f05e9ba5a4eda516c3342dfbc5962ac2874</VID>
+
+        <merchantProductId xmlns="" xsi:type="xsd:string">MLG-GOLD-PASS</merchantProductId>
+
+        <status xmlns="" xsi:type="vin:ProductStatus">Active</status>
+      </products>
+    </fetchAllResponse>
+  </soap:Body>
+</soap:Envelope>

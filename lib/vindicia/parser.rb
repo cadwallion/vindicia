@@ -12,7 +12,7 @@ module Vindicia
 
     def parse
       hash = @xml_response.find_soap_body["#{@method_called}_response".to_sym]
-      if Vindicia.objectify?
+      if Vindicia.objectify
         return objectify(hash) { |k,v| k == :xmlns }
       else
         return hash

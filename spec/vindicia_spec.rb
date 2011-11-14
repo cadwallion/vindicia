@@ -68,3 +68,19 @@ describe Vindicia do
     Vindicia.endpoint.should == "https://soap.prodtest.sj.vindicia.com/v3.7/soap.pl"
   end
 end
+
+describe "Vindicia::Product" do
+  before do
+    Vindicia.configure do |config|
+      config.environment = 'prodtest'
+      config.version = '3.6'
+    end
+  end
+
+  describe "#fetch_all" do
+    it "should call Vindicia.parse_response" do
+      Vindicia.should_receive(:parse_response)
+      Vindicia::Product.fetch_all(:page => 1, :pageSize => 2)
+    end
+  end
+end
