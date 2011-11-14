@@ -21,9 +21,6 @@ Calling `configure` triggers the `bootstrap` method which will automatically gen
 
 After that, all APIs are classes within the Vindicia namespace, with their soap actions as method calls
 
-# Known Issues
-
-WSDL files are being live-downloaded every run. It'd be nice to cache them locally.
 
 # Credits
 
