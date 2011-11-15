@@ -8,7 +8,7 @@ require 'vindicia/parser'
 Savon.configure do |config|
   config.soap_version = 1
   # doing this to facilitate fallback
-  config.raise_errors = false
+  #config.raise_errors = false
 end
 
 module Vindicia

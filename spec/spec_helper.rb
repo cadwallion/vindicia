@@ -24,9 +24,12 @@ Dir[File.dirname(__FILE__) + "/support/Vindicia_*.xsd"].each do |xsd|
                        :body => File.read(xsd))
 end
 
-Dir[File.dirname(__FILE__) + "/support/*_*.wsdl"].each do |wsdl|
-  match = wsdl.match(/support\/(.+)_(.+)\.wsdl/)
-  FakeWeb.register_uri(:get, 
+def stub_wsdls
+  Dir[File.dirname(__FILE__) + "/support/*_*.wsdl"].each do |wsdl|
+    match = wsdl.match(/support\/(.+)_(.+)\.wsdl/)
+    FakeWeb.register_uri(:get, 
       "http://soap.prodtest.sj.vindicia.com/#{match[2]}/#{match[1]}.wsdl",
       :body => File.read(wsdl))
+  end 
 end
+

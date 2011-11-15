@@ -1,6 +1,14 @@
 require 'spec_helper'
 
 describe Vindicia do
+  before do
+    stub_wsdls
+  end
+
+  after do
+    FakeWeb.clean_registry
+  end
+
   describe "#authenticate" do
     it "should set authentication parameters" do
       Vindicia.authenticate('login', 'password', 'production')
@@ -81,6 +89,24 @@ describe "Vindicia::Product" do
     it "should call Vindicia.parse_response" do
       Vindicia.should_receive(:parse_response)
       Vindicia::Product.fetch_all(:page => 1, :pageSize => 2)
+    end
+
+    context "in production when primary endpoint fails" do
+      before do
+        Vindicia.environment = 'production'
+      end
+
+      it "should retry the API call on the fallback endpoint" do
+        FakeWeb.register_uri(:get, "https://soap.vindicia.com/v3.6/soap.pl",
+                           :status => ['500', 'Unexpected error'])
+
+        FakeWeb.register_uri(:get, "https://soap-alt.vindicia.com/v3.6/soap.pl",
+                          :body => File.read(File.dirname(__FILE__) + "/support/fetch_all.xml"))
+
+        Vindicia.stub(:parse_response) { }
+        Vindicia::Product.should_receive(:soap_call).exactly(2).times
+        Vindicia::Product.fetch_all(:page => 1, :pageSize => 2)
+      end
     end
   end
 end

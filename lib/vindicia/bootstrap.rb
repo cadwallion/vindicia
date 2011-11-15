@@ -91,14 +91,14 @@ module Vindicia
           endpoints.each do |endpoint|
             response = self.soap_call(method, args.first, endpoint)
 
-            if response.http_error?
-              # @TODO: Log the failure and that we're moving to fallback
+            if response.nil?
+              next
+            elsif response.http_error?
               next
             else
               return Vindicia.parse_response(response, method)
             end
           end
-          raise Savon::HTTP::Error, 'All endpoints appear offline'
         end
       end
     end
