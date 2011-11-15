@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = "vindicia"
   s.platform    = Gem::Platform::RUBY
-  s.version     = "0.4.1"
+  s.version     = "0.4.2"
   s.authors     = ["Jamie Macey"]
   s.email       = ["jamie@almlabs.com"]
   s.homepage    = "http://github.com/almlabs/vindicia"
