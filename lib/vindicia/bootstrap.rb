@@ -127,5 +127,14 @@ module Vindicia
         file << wsdl_body
       end
     end
+
+    def clear_api_cache
+      Vindicia.class_eval do
+        Vindicia.constants.each do |class_name|
+          remove_const(class_name) unless [:Bootstrap, :Parser].include? class_name
+        end
+      end
+      @bootstrapped = false
+    end
   end
 end

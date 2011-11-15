@@ -100,4 +100,22 @@ describe Vindicia::Bootstrap do
 
     end
   end
+
+  describe "#clear_api_cache" do
+    it "should undefine all the Vindicia constants" do
+      Vindicia.version = '3.6'
+      Vindicia.stub(:valid_soap_api?) { true } 
+      Vindicia.bootstrap_class("Account")
+
+      Vindicia.clear_api_cache
+
+      Vindicia.constants.should_not include(:Account)
+    end
+
+    it "should reset bootstrapped state" do
+      Vindicia.set_bootstrapped(true)
+      Vindicia.clear_api_cache
+      Vindicia.bootstrapped?.should_not be_true
+    end
+  end
 end
